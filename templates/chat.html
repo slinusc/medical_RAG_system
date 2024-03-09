@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../static/css/style_chat.css">
+    <title>Digital Assistent</title>
+</head>
+<body>
+
+<div class="container py-5">
+
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Digital Assistent</h1>
+            <p class="lead">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore</p>
+        </div>
+
+
+        <div class="row">
+            <div class="col">
+                <a href="/logout" class="back-btn">Logout</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4">
+        <div class="col">
+            <div class="chat-area h-100">
+                <div class="card-body">
+                    <div class="row clearfix">
+                        <div class="col-lg-12">
+                            <div class="card chat-app">
+                                <div class="chat">
+                                    <div class="chat-header clearfix" style="background: #e4ebfe;">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="chat-about d-flex align-items-center">
+                                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png"
+                                                         alt="avatar">
+                                                    <h3>Digital Assistent</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="chat-history">
+                                        <ul class="m-b-0" id="chat-messages">
+                                            <!-- Nachrichten werden hier eingefügt -->
+                                        </ul>
+                                    </div>
+                                    <div class="chat-message clearfix">
+                                        <form id="chat-form">
+                                            <div class="input-group">
+                                                <button type="submit" class="input-group-text" id="basic-addon1"><i
+                                                        class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                                                <input type="text" id="chat-input" class="form-control"
+                                                       placeholder="Enter text here..."
+                                                       aria-label="Text input with send icon">
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="col">
+            <div class="recomm-area h-100">
+                <div class="card-body">
+                    <div class="chat-header clearfix" style="background: #e4ebfe;">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="chat-about">
+                                    <h3>Important Information</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <p class="card-text">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../static/js/chat.js"></script>
+
+</body>
+</html>
