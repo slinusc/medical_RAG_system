@@ -96,5 +96,7 @@ def chat():
             return jsonify({'response': 'Session nicht gefunden. Bitte erneut anmelden.'}), 403
 
 
+
+
 if __name__ == '__main__':
     app.run(debug=True)
