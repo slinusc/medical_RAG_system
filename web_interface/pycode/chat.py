@@ -1,5 +1,5 @@
 from openai import OpenAI
-import retriever
+from .retriever import Retriever
 
 class Chat:
     def __init__(self):
@@ -8,7 +8,7 @@ class Chat:
         self.initial_message = []
         self.set_initial_message()
         # Initialize the retriever with the correct JSON file path
-        self.retriever = retriever.Retriever('../../langchain_notebook/preprocessed_first1000.json')
+        self.retriever = Retriever("C:/Users/linus/OneDrive/BSc_Data_Science/Semester_4/Big_Data_Project/medical_RAG_system/langchain_notebook/preprocessed_first1000.json")
 
     def set_initial_message(self):
         self.initial_message = [
@@ -33,7 +33,7 @@ class Chat:
             model=self.model,
             messages=messages
         )
-        return completion.choices[0].message
+        return completion.choices[0].message.content
 
 if __name__ == '__main__':
     chat = Chat()

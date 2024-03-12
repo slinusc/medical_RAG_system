@@ -64,13 +64,13 @@ def login():
 
 @app.route('/')
 def login_page():
-    return render_template('templates/login_page.html')
+    return render_template('login_page.html')
 
 
 @app.route('/index')
 def index():
     if 'username' in session:
-        return render_template('templates/chat.html', username=session['username'])
+        return render_template('chat.html', username=session['username'])
     else:
         return redirect(url_for('login_page'))
 
