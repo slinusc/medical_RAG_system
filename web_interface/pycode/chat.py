@@ -1,5 +1,5 @@
 from openai import OpenAI
-from .retriever import Retriever
+from retriever import Retriever
 
 class Chat:
     def __init__(self):
