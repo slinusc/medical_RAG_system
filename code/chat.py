@@ -1,5 +1,5 @@
 from openai import OpenAI
-from retriever import Retriever
+from code.retriever import Retriever
 
 
 class Chat:
@@ -9,7 +9,7 @@ class Chat:
         self.initial_message = []
         self.set_initial_message()
         # Initialize the retriever with the correct JSON file path
-        self.retriever = Retriever("C:/Users/linus/OneDrive/BSc_Data_Science/Semester_4/Big_Data_Project/medical_RAG_system/langchain_notebook/preprocessed_first1000.json")
+        self.retriever = Retriever("langchain_notebook/preprocessed_first1000.json")
 
     def set_initial_message(self):
         self.initial_message = [
@@ -17,7 +17,8 @@ class Chat:
              "content": "Answering questions and providing information about the newest developments in the field of "
                         "medicine by using the provided content of the retrieved documents. Only answer the questions that are "
                         "related to the provided documents. Only use the information from the provided documents. Do not use "
-                        "any other sources."},
+                        "any other sources. Your responses will be used for research purposes only, "
+                        "so please have a definite answer."},
 
         ]
 
