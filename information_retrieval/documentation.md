@@ -16,9 +16,9 @@ It organizes data using a doubly linked data structure. MongoDB processes shut d
 #### Loading data into Elasticsearch:
 1. Created an dense vector index with 768 dimensions for bioBERT embeddings.
 2. Indexed the embeddings of the first 50 JSONL files in the dense vector index.
-3. Indexing time took: [31:25<00:00, 37.71s/it] for 709'071 documents.
+3. Indexing time took: [2:14: 00<00:00, 80.71s/it] for 1'800'000 documents.
 4. 
-5. Bulk loading (400 docs) turned out to be significantly faster than single document loading.
+5. Bulk loading (200 docs) turned out to be significantly faster than single document loading.
 
 #### Loading data into MongoDB:
 1. Created a collection with bioBERT embeddings.
@@ -31,7 +31,6 @@ It organizes data using a doubly linked data structure. MongoDB processes shut d
 
 - **Full text search** using BM25 ranking algorithm.
 - **Semantic search** using bioBERT embedding and KNN / Cosine Similarity.
-- **DPR** (Dense Passage Retriever) Neural Retriever trained on Q&A data set.
 - **Hybrid search** previous ranking using BM25 followed by semantic search and/or DPR.
 
   (optional)
