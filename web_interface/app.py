@@ -12,7 +12,6 @@ app.config["MONGO_URI"] = "mongodb://localhost:27017/RAG"
 mongo = PyMongo(app)
 app.secret_key = os.urandom(16)
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
