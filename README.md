@@ -1,6 +1,6 @@
 Here is our current file structure.
 ```
-.
+
 ├── information_retrieval
 │   ├── elastic_container
 │   │   ├── elastic.ipynb
@@ -29,6 +29,7 @@ Here is our current file structure.
 ├── rag_system
 │   ├── chat.py
 │   └── llm.py
+├── README.md
 └── web_interface
     ├── app.py
     ├── pycode
@@ -48,5 +49,7 @@ Here is our current file structure.
     └── templates
         ├── chat.html
         └── login_page.html
+
+
 
 ```
