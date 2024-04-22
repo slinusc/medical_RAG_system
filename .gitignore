@@ -160,3 +160,5 @@ cython_debug/
 .idea/
 
 data/
+
+/home/ubuntu/stuhllin/medical_RAG_system/information_retrieval/faiss_container/faiss_indices
