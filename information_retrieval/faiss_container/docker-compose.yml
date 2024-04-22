@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  faiss-app:
+    image: continuumio/anaconda3
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server.py:/app/server.py
+      - ./faiss_indices:/app/faiss_indices
+    working_dir: /app
+    environment:
+      - FLASK_APP=server.py
+      - FLASK_RUN_HOST=0.0.0.0
+    command: >
+      /bin/bash -c "conda install -c pytorch faiss-cpu -y &&
+                    pip install flask numpy &&
+                    python server.py"
