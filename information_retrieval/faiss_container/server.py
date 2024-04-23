@@ -5,7 +5,7 @@ import numpy as np
 app = Flask(__name__)
 
 # Load the Faiss index (assuming the index has already been created and saved)
-index = faiss.read_index("/workspaces/faiss/faiss_indices/PM_index.index")
+index = faiss.read_index("/app/faiss_indices/PM_index.index")
 
 @app.route('/search', methods=['POST'])
 def search():
