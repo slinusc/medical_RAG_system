@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 import faiss
 import numpy as np
+import pandas as pd
 
 app = Flask(__name__)
 
 # Load the Faiss index (assuming the index has already been created and saved)
-index = faiss.read_index("/app/faiss_indices/PM_index.index")
+index = faiss.read_index("/app/faiss_indices/bioBERT_index.index")
+PMIDs = pd.read_csv("/app/PMIDs/bioBERT_pmids.csv", header=None).values.flatten()
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -17,7 +19,8 @@ def search():
     k = int(data['k'])
     
     # Perform the search in the Faiss index
-    distances, indices = index.search(queries, k)
+    distances, i = index.search(queries, k)
+    indices = PMIDs[i]
     
     # Return the response as JSON
     return jsonify(indices=indices.tolist(), distances=distances.tolist())

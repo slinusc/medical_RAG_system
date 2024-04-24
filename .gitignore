@@ -162,3 +162,5 @@ cython_debug/
 data/
 
 information_retrieval/faiss_container/faiss_indices
+
+information_retrieval/faiss_container/PMIDs
