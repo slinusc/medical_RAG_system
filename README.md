@@ -1,6 +1,6 @@
 Here is our current file structure.
 ```
-
+.
 ├── information_retrieval
 │   ├── elastic_container
 │   │   ├── elastic.ipynb
@@ -23,6 +23,10 @@ Here is our current file structure.
 │   │       └── dataset_filter
 │   │           ├── filter_data.ipynb
 │   │           └── Q&A.py
+│   ├── faiss_container
+│   │   ├── docker-compose.yml
+│   │   ├── faiss_insert_data.ipynb
+│   │   └── server.py
 │   └── ray
 │       ├── embedd_docs.ipynb
 │       └── Embedding.py
@@ -49,7 +53,6 @@ Here is our current file structure.
     └── templates
         ├── chat.html
         └── login_page.html
-
 
 
 ```
