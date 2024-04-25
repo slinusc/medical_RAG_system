@@ -47,7 +47,7 @@ class Chat:
                 model=self.model,
                 messages=messages,
                 max_tokens=200,
-                temperature=0.0 # 0.0 for deterministic completions wihout "creativity".
+                temperature=0.1 # 0.0 for deterministic completions wihout "creativity".
             )
             return completion.choices[0].message.content
         except Exception as e:
