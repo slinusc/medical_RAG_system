@@ -17,11 +17,12 @@ class RAG:
         else:
             raise ValueError("Invalid retriever value. Choose 1 for bioBERT, 2 for BM25, or 3 for hybrid.")
 
-        self.chat = Chat(question=question_type)
+        self.chat = Chat(question_type=question_type)
         self.n_docs = n_docs
 
     def get_answer(self, question: str)->str:
         retrieved_docs = self.retriever.retrieve_docs(question, self.n_docs)
-        return self.chat.create_chat(question, retrieved_docs)
-    
         
+        #TODO: add the retrieved PMID's to the chat
+
+        return self.chat.create_chat(question, retrieved_docs)
