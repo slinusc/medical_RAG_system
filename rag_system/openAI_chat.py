@@ -45,7 +45,9 @@ class Chat:
         try:
             completion = self.client.chat.completions.create(
                 model=self.model,
-                messages=messages
+                messages=messages,
+                max_tokens=200,
+                temperature=0.0 # 0.0 for deterministic completions wihout "creativity".
             )
             return completion.choices[0].message.content
         except Exception as e:
