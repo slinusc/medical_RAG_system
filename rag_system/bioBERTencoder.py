@@ -28,7 +28,7 @@ class TextEncooderBioBERT:
 
 if __name__ == "__main__":
 
-    embedder = TextEmbedder()
+    embedder = TextEncooderBioBERT()
     text = "This is a test sentence."
     start = time.time()
     embedding = embedder.embed(text)
