@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 import os
 from pathlib import Path
@@ -5,7 +7,6 @@ from tqdm import tqdm
 from elasticsearch import Elasticsearch, helpers
 
 password = os.getenv("ELASTIC_PASSWORD")
-password = "btA+=QjPyyUUx0Tq*T9f"
 
 es = Elasticsearch(
     hosts=[{"host": "localhost", "port": 9200, "scheme": "https"}],
@@ -14,7 +15,7 @@ es = Elasticsearch(
 )
 
 # Define the index name
-index_name = "pubmed_index"
+index_name = "pubmed_index_embedded"
 
 # Delete the index if it exists
 if es.indices.exists(index=index_name):
@@ -36,7 +37,7 @@ if not es.indices.exists(index=index_name):
 # Create the index with the defined mapping
 es.indices.create(index=index_name, body=mapping)
 
-source_directory = Path('./pubmed/')
+source_directory = Path('/home/ubuntu/data/pubmed_bioBERT')
 error_log_path = Path('./errors.jsonl')  # Pfad zur Fehlerprotokolldatei
 
 def bulk_index_documents(source_directory, index_name, error_log_path):
@@ -60,8 +61,8 @@ def bulk_index_documents(source_directory, index_name, error_log_path):
                             doc = json.loads(line)
                             
                             # Remove the "embeddings" field from the document
-                            if "embeddings" in doc:
-                                del doc["embeddings"]
+                            #if "embeddings" in doc:
+                            #    del doc["embeddings"]
                             
                             action = {
                                 "_index": index_name,

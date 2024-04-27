@@ -3,7 +3,7 @@ import torch
 import time
 
 
-class TextEmbedder:
+class TextEncooderBioBERT:
     def __init__(self, model_name='dmis-lab/biobert-v1.1', max_length=512):
         if torch.cuda.is_available():
             self.device = "cuda"
@@ -28,7 +28,7 @@ class TextEmbedder:
 
 if __name__ == "__main__":
 
-    embedder = TextEmbedder()
+    embedder = TextEncooderBioBERT()
     text = "This is a test sentence."
     start = time.time()
     embedding = embedder.embed(text)
