@@ -27,9 +27,9 @@ class RAG:
     def get_answer(self, question: str) -> str:
         retrieved_docs = json.loads(self.retriever.retrieve_docs(question, self.n_docs))
         pmids = self.extract_pmids(retrieved_docs)
-        # You could return the PMIDs as part of the answer or use them otherwise.
+        # the chat response is a json string {'response': '...', 'used_PMIDs': [...]}
         answer = self.chat.create_chat(question, retrieved_docs)
-        # reformating the answer to json: {'response': '...', 'used_PMIDs': [...], PMIDS: [...]}
+        # now adding the retrieved PMIDs to the response
         answer = json.loads(answer)
         answer['PMIDs'] = pmids
         return json.dumps(answer)
