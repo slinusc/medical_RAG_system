@@ -15,13 +15,16 @@ class Chat:
             "You are a medical assistant. Your task is to provide information "
             "based on specific documents provided to you. Answer the questions "
             "by referring directly to the documents and cite the PMIDs of the documents you used. "
-            "If you cannot answer using the documents, state that you cannot answer the question."
+            "1. Go through every dokument and evaluate if one ore more are relevant to answer the question. "
+            "2. Answer the question based on the relevant documents."
+            "3. If you cannot answer using the documents, state that you cannot answer the question."
             "Your answer should be structured as a JSON object with the answer as 'response' and the PMIDs used as 'used_PMIDs.'"
-            "The 'response' should always be fulltext. The 'used_PMIDs' should be a list of PMIDs. "
+            
         )
-        if question_type == 2:
-            return basic_context + " Respond only with 'yes' or 'no' or 'no docs found'."
-        return basic_context
+        if question_type == 1:
+            return basic_context + "The 'response' should always be fulltext with referenced PMIDs in brackets. The 'used_PMIDs' should be a list of PMIDs. "
+        elif question_type == 2:
+            return basic_context + "The 'response' should only be 'yes' or 'no' or 'no_docs_found'. The 'used_PMIDs' should be a list of PMIDs. "
 
     def set_initial_message(self) -> List[dict]:
         return [{"role": "system", "content": self.context}]
@@ -39,7 +42,7 @@ class Chat:
                 model=self.model,
                 messages=messages,
                 max_tokens=300,
-                temperature=0.0 # Low temperature to reduce randomness
+                temperature=0.1 # Low temperature to reduce randomness
             )
 
             response_content = completion.choices[0].message.content
