@@ -16,10 +16,11 @@ class Chat:
             "based on specific documents provided to you. Answer the questions "
             "by referring directly to the documents and cite the PMIDs of the documents you used. "
             "If you cannot answer using the documents, state that you cannot answer the question."
-            "Your answer should be structured as a JSON object with the response and the PMIDs used as used_PMIDs."
+            "Your answer should be structured as a JSON object with the answer as 'response' and the PMIDs used as 'used_PMIDs.'"
+            "The 'response' should always be fulltext. The 'used_PMIDs' should be a list of PMIDs. "
         )
         if question_type == 2:
-            return basic_context + " Respond only with 'yes' or 'no'."
+            return basic_context + " Respond only with 'yes' or 'no' or 'no docs found'."
         return basic_context
 
     def set_initial_message(self) -> List[dict]:
@@ -38,7 +39,7 @@ class Chat:
                 model=self.model,
                 messages=messages,
                 max_tokens=300,
-                temperature=0.1
+                temperature=0.0 # Low temperature to reduce randomness
             )
 
             response_content = completion.choices[0].message.content

@@ -31,5 +31,5 @@ class RAG:
         answer = self.chat.create_chat(question, retrieved_docs)
         # now adding the retrieved PMIDs to the response
         answer = json.loads(answer)
-        answer['PMIDs'] = pmids
+        answer['retrieved_PMIDs'] = pmids
         return json.dumps(answer)
