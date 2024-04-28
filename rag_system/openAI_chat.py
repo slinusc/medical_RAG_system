@@ -1,6 +1,7 @@
 import openai
 import os
-from typing import List
+from typing import List, Dict
+import json
 
 class Chat:
     def __init__(self, question_type: int = 1, api_key: str = os.getenv('OPENAI_API_KEY'), model: str = "gpt-3.5-turbo"):
@@ -10,45 +11,44 @@ class Chat:
         self.context = self.set_context(question_type)
 
     def set_context(self, question_type: int) -> str:
-        if question_type == 1:
-            return (
-                "You are a medical assistant, answering questions and providing information "
-                "about the newest developments in the field of medicine by using the provided "
-                "content of the retrieved documents. Only answer the questions that are related "
-                "to the provided documents. Only use the information from the provided documents. "
-                "Do not use any other sources or knowledge. If you aren't able to answer the question with the provided "
-                "documents, just say that you cannot answer this question. Your responses will be used for medical purposes, "
-                "so please have a definite answer."
-            )
-        elif question_type == 2:
-            return (
-                "You are a medical assistant, answering questions and providing information "
-                "about the newest developments in the field of medicine by using the provided "
-                "content of the retrieved documents. Only answer the questions that are related "
-                "to the provided documents. Only use the information from the provided documents. "
-                "Do not use any other sources or knowledge. If you aren't able to answer the question with the provided "
-                "documents, just say that you cannot answer this question. Your responses will be used for medical purposes, "
-                "so please have a definite answer."
-                "- The question should only be answered with yes or no."
-            )
-        else:
-            raise ValueError("Invalid question type. Choose 1 for open answer questions or 2 for yes/no questions.")
+        basic_context = (
+            "You are a medical assistant. Your task is to provide information "
+            "based on specific documents provided to you. Answer the questions "
+            "by referring directly to the documents and cite the PMIDs of the documents you used. "
+            "If you cannot answer using the documents, state that you cannot answer the question."
+            "Your answer should be structured as a JSON object with the response and the PMIDs used as used_PMIDs."
+        )
+        if question_type == 2:
+            return basic_context + " Respond only with 'yes' or 'no'."
+        return basic_context
 
     def set_initial_message(self) -> List[dict]:
         return [{"role": "system", "content": self.context}]
 
-    def create_chat(self, user_message: str, retrieved_documents: List[str]) -> str:
+    def create_chat(self, user_message: str, retrieved_documents: Dict) -> str:
         messages = self.set_initial_message()
         messages.append({"role": "user", "content": f"Answer the following question: {user_message}"})
-        messages.append({"role": "system", "content": f"Use these documents to answer the question: {' '.join(retrieved_documents)}"})
-        
+
+        document_texts = [f"PMID {doc['PMID']}: {doc['title']} {doc['content']}" for doc in retrieved_documents.values()]
+        documents_message = " ".join(document_texts)
+        messages.append({"role": "system", "content": documents_message})
+
         try:
             completion = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                max_tokens=200,
-                temperature=0.1 # 0.0 for deterministic completions wihout "creativity".
+                max_tokens=300,
+                temperature=0.1
             )
-            return completion.choices[0].message.content
+
+            response_content = completion.choices[0].message.content
+            try:
+                # Attempt to parse the response as JSON
+                response_data = json.loads(response_content)
+                return json.dumps(response_data)  # Directly return the JSON if parsing is successful
+            except json.JSONDecodeError:
+                # If parsing fails, return a custom error message
+                return json.dumps({"error": "Response format is incorrect, expected JSON.", "response": response_content})
+        
         except Exception as e:
-            return f"An error occurred: {e}"
+            return json.dumps({"error": str(e)})

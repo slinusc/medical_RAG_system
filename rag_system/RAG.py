@@ -1,10 +1,10 @@
+import json
 from bioBERTencoder import TextEncooderBioBERT
 from linkBioBERTencoder import TextEncooderLinkBioBERT
 from semantic_search_bioBERT import bioBERTretriever
 from BM25_search import BM25retriever
 from hybrid_search import hybridRertiever # not finished yet
 from openAI_chat import Chat
-
 
 class RAG:
     def __init__(self, retriever=1, question_type=1, n_docs=10):
@@ -20,9 +20,16 @@ class RAG:
         self.chat = Chat(question_type=question_type)
         self.n_docs = n_docs
 
-    def get_answer(self, question: str)->str:
-        retrieved_docs = self.retriever.retrieve_docs(question, self.n_docs)
-        
-        #TODO: add the retrieved PMID's to the chat
+    def extract_pmids(self, docs):
+        # Extracts PMIDs from the documents and returns them as a list
+        return [doc["PMID"] for doc in docs.values()]
 
-        return self.chat.create_chat(question, retrieved_docs)
+    def get_answer(self, question: str) -> str:
+        retrieved_docs = json.loads(self.retriever.retrieve_docs(question, self.n_docs))
+        pmids = self.extract_pmids(retrieved_docs)
+        # You could return the PMIDs as part of the answer or use them otherwise.
+        answer = self.chat.create_chat(question, retrieved_docs)
+        # reformating the answer to json: {'response': '...', 'used_PMIDs': [...], PMIDS: [...]}
+        answer = json.loads(answer)
+        answer['PMIDs'] = pmids
+        return json.dumps(answer)
