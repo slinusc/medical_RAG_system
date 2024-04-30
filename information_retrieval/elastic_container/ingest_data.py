@@ -25,14 +25,32 @@ if es.indices.exists(index=index_name):
 if not es.indices.exists(index=index_name):
     # Define the mapping
     mapping = {
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "default": {
+                    "type": "standard",  # You can choose from many types like `english`, `standard`, etc., depending on your needs.
+                    "stopwords": "_english_"  # This is optional and can be customized.
+                }
+            }
+        }
+    },
     "mappings": {
         "properties": {
             "content": {
-                "type": "text"
+                "type": "text",
+                "analyzer": "default",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
             }
         }
     }
 }
+
 
 # Create the index with the defined mapping
 es.indices.create(index=index_name, body=mapping)
@@ -93,3 +111,6 @@ bulk_index_documents(source_directory, index_name, error_log_path)
 # Count and print the number of documents in the index
 count_result = es.count(index=index_name)
 print(f"Index contains {count_result['count']} documents.")
+
+# to run this script in the background, use the following command:
+# nohup python3 ./ingest_data.py > output.log 2>&1 &
