@@ -6,7 +6,7 @@ import sys
 
 # Navigate up from 'dataset_filter' to 'evaluation', then 'information_retrieval', and up to the root
 # Then access the 'rag_system' directory
-sys.path.append("../../../../rag_system/")
+sys.path.append("../../rag_system/")
 
 # Import the module
 from RAG import RAG
@@ -53,7 +53,7 @@ class RAG_evaluator:
             response = self.request_selector(question, retriever_type)
             if response is not None:
                 results.append(response)
-                iter = iter + 1
+        #       iter = iter + 1
         #      if iter%10 == 0: #keep track how many iterations where done
         #              print(iter)
         #      if iter > 20:
