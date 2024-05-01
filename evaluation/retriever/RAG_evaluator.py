@@ -33,7 +33,7 @@ class RAG_evaluator:
             output_path (str): Path where the output results will be written in JSON format.
         """
 
-    def run_eval(self):
+    def run_eval(self, retriever_type=1):
         """
         Executes the evaluation of the RAG system by reading the question JSON file, processing each question, and writing the results to the output JSON file. The process includes timing the evaluation and displaying progress.
         """
@@ -50,7 +50,7 @@ class RAG_evaluator:
         # Process each question and display progress
         for question in tqdm(data["questions"], desc="Processing questions"):
             # response = self.request_selector(question['id'], question['type'])
-            response = self.request_selector(question)
+            response = self.request_selector(question, retriever_type)
             if response is not None:
                 results.append(response)
                 iter = iter + 1
@@ -69,7 +69,7 @@ class RAG_evaluator:
         print(f"Results written to {self.output_path}")
         print(f"Processing time: {elapsed_time:.2f} seconds")
 
-    def request_selector(self, question):
+    def request_selector(self, question, retriever_type=1):
         """
         Selects the appropriate RAG model based on the question type and processes the question to get the RAG's response. It also evaluates the correctness of the response and the effectiveness of the document retrieval.
 
@@ -86,7 +86,7 @@ class RAG_evaluator:
             case "yesno":
 
                 # Method to evaluate  based on the query type
-                rag = RAG(retriever=1, question_type=2)
+                rag = RAG(retriever=retriever_type, question_type=2)
                 # time request
                 start_time = time.time()
                 rag_answer = rag.get_answer(
