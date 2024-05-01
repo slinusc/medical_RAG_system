@@ -1,10 +1,8 @@
 import json
-from bioBERTencoder import TextEncooderBioBERT
-from linkBioBERTencoder import TextEncooderLinkBioBERT
+from openAI_chat import Chat
 from semantic_search_bioBERT import bioBERTretriever
 from BM25_search import BM25retriever
 from hybrid_search import hybridRertiever # not finished yet
-from openAI_chat import Chat
 
 class RAG:
     def __init__(self, retriever=1, question_type=1, n_docs=10):

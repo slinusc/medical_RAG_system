@@ -4,6 +4,7 @@ Here is our current file structure.
 ├── information_retrieval
 │   ├── elastic_container
 │   │   ├── elastic.ipynb
+│   │   ├── errors.jsonl
 │   │   ├── ingest_data.py
 │   │   └── start_elasticsearch.sh
 │   ├── evaluation
@@ -20,19 +21,30 @@ Here is our current file structure.
 │   │   │       ├── eval_mongo.ipynb
 │   │   │       └── mongoDB.ipynb
 │   │   └── retriever
-│   │       └── dataset_filter
-│   │           ├── filter_data.ipynb
-│   │           └── Q&A.py
+│   │       ├── dataset_filter
+│   │       │   ├── filter_data.ipynb
+│   │       │   └── Q&A.py
+│   │       └── questions_explorer
+│   │           ├── evaluate_response.ipynb
+│   │           └── explore_questions.ipynb
 │   ├── faiss_container
 │   │   ├── docker-compose.yml
+│   │   ├── Dockerfile
 │   │   ├── faiss_insert_data.ipynb
 │   │   └── server.py
 │   └── ray
 │       ├── embedd_docs.ipynb
 │       └── Embedding.py
 ├── rag_system
-│   ├── chat.py
-│   └── llm.py
+│   ├── bioBERTencoder.py
+│   ├── BM25_search.py
+│   ├── hybrid_search.py
+│   ├── linkBioBERTencoder.py
+│   ├── openAI_chat.py
+│   ├── pipe.drawio.png
+│   ├── pipeline.ipynb
+│   ├── RAG.py
+│   └── semantic_search_bioBERT.py
 ├── README.md
 └── web_interface
     ├── app.py
@@ -53,6 +65,9 @@ Here is our current file structure.
     └── templates
         ├── chat.html
         └── login_page.html
+
+20 directories, 44 files
+
 
 
 ```
