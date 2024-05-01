@@ -19,7 +19,7 @@ class Chat:
             "1. Go through every dokument and evaluate if one ore more are relevant to answer the question. "
             "2. Answer the question based on the relevant documents."
             "3. If you cannot answer using the documents, state that you cannot answer the question."
-            "Your answer should be structured as a JSON object with the answer as 'response' and the PMIDs used as 'used_PMIDs.'"
+            "Your answer should be structured as a JSON object with the answer as 'response' and a list of PMIDs used as 'used_PMIDs'."
         )
 
         if question_type == 1:
