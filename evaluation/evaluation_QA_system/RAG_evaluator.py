@@ -97,23 +97,18 @@ class RAG_evaluator:
                 # Stop timing
                 end_time = time.time()
 
-                # typecast string into json object
-                rag_answer = json.loads(rag_answer)
                 try:
+                    # typecast string into json object
+                    rag_answer = json.loads(rag_answer)
                     # Extracting the necessary information if the keys are present
                     response = rag_answer.get("response")
                     k_pubmedids = rag_answer["retrieved_PMIDs"]
                     used_pubmedids = rag_answer["used_PMIDs"]
                     # Calculate elapsed time in seconds
                     elapsed_time = end_time - start_time
-                    correct_pubmed, num_correct_pubmed, matched_ids = (
-                        self.compare_pubmed_ids(used_pubmedids, question["documents"])
-                    )
-                    (
-                        correct_pubmed_retrieved,
-                        num_correct_pubmed_retrieved,
-                        matched_ids_retrieved,
-                    ) = self.compare_pubmed_ids(k_pubmedids, question["documents"])
+
+                    ground_truth_ids = self.extraxt_pubmedid(question["documents"])
+
                 except Exception as e:
                     print(question["body"])
                     print("caused the following error:")
@@ -145,13 +140,9 @@ class RAG_evaluator:
             "trueresponse_exact": question["exact_answer"],
             "ragresponse": response,
             "answered_correct": answered_correct,
-            "percentage_correct_answers": percentage_correct_answers,
-            "returned_correct_pubmedid": correct_pubmed,
-            "numb_of_pubmedid_returned": num_correct_pubmed,
-            "returned_pubmedids": matched_ids,
-            "retrieved_correct_pubmed": correct_pubmed_retrieved,
-            "num_of_pubmedid_retrieved": num_correct_pubmed_retrieved,
-            "retrieved_pubmedids": matched_ids_retrieved,
+            "pubmedids_retrieved": k_pubmedids,
+            "pubmedids_uses_by_rag": used_pubmedids,
+            "pubmedids_ground_truth": ground_truth_ids,
             "requestime": elapsed_time,
         }
 
@@ -185,7 +176,6 @@ class RAG_evaluator:
         percentage_correct_answers = 100 if answered_correct else 0
 
         return answered_correct, percentage_correct_answers
-    
 
     def compare_pubmed_ids(self, pubmed_ids, documents):
         """
@@ -219,6 +209,15 @@ class RAG_evaluator:
 
         return correct_pubmed, num_correct_pubmed, matched_ids
 
+    def extraxt_pubmedid(self, documents):
+        # Extract PubMed IDs from the document URLs
+        extracted_ids = [
+            re.search(r"pubmed/(\d+)", doc).group(1)
+            for doc in documents
+            if re.search(r"pubmed/(\d+)", doc)
+        ]
+        return extracted_ids
+
     @staticmethod
     def analyze_performance(json_file_path):
         # Load the JSON data
@@ -230,22 +229,37 @@ class RAG_evaluator:
 
         # extract the retriever number from the file path
         retriever = re.search(r"ragver_(\d+)", json_file_path).group(1)
-        print(f'Summary Statistics for RAG with retriever {retriever}')
+        print(f"Summary Statistics for RAG with retriever {retriever}")
         print(f"Total Questions: {len(df)}")
 
         # Calculate mean and standard deviation for the response time
-        mean_response_time = df['requestime'].mean()
-        sd_response_time = df['requestime'].std()
+        mean_response_time = df["requestime"].mean()
+        sd_response_time = df["requestime"].std()
         print("\nResponse Time:")
         print("Mean: {:.2f} seconds".format(mean_response_time))
         print("Standard Deviation: {:.2f} seconds".format(sd_response_time))
 
         # Calculate accuracy, recall, precision, and F1-score
         # Assuming 'actual' and 'predicted' are the column names for your true and predicted binary classification outcomes
-        accuracy = accuracy_score(df['trueresponse_exact'], df['ragresponse'])
-        recall = recall_score(df['trueresponse_exact'], df['ragresponse'], average='macro', zero_division=0)
-        precision = precision_score(df['trueresponse_exact'], df['ragresponse'], average='macro', zero_division=0)
-        f1 = f1_score(df['trueresponse_exact'], df['ragresponse'], average='macro', zero_division=0)
+        accuracy = accuracy_score(df["trueresponse_exact"], df["ragresponse"])
+        recall = recall_score(
+            df["trueresponse_exact"],
+            df["ragresponse"],
+            average="macro",
+            zero_division=0,
+        )
+        precision = precision_score(
+            df["trueresponse_exact"],
+            df["ragresponse"],
+            average="macro",
+            zero_division=0,
+        )
+        f1 = f1_score(
+            df["trueresponse_exact"],
+            df["ragresponse"],
+            average="macro",
+            zero_division=0,
+        )
 
         print("\nClassification Metrics:")
         print("Accuracy: {:.2f}".format(accuracy))
@@ -255,6 +269,13 @@ class RAG_evaluator:
 
         # Additional summary statistics for other data aspects
         print("\nAdditional Summary Statistics:")
-        print("Average Number of PubMed IDs Returned: {:.2f}".format(df['numb_of_pubmedid_returned'].mean()))
-        print("Average Number of PubMed IDs Retrieved: {:.2f}".format(df['num_of_pubmedid_retrieved'].mean()))
-
+        print(
+            "Average Number of PubMed IDs Returned: {:.2f}".format(
+                df["numb_of_pubmedid_returned"].mean()
+            )
+        )
+        print(
+            "Average Number of PubMed IDs Retrieved: {:.2f}".format(
+                df["num_of_pubmedid_retrieved"].mean()
+            )
+        )
