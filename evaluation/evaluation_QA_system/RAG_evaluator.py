@@ -134,15 +134,15 @@ class RAG_evaluator:
                 return None
 
         return {
-            "questionid": question["id"],
-            "querytype": question["type"],
-            "question": question["body"],
-            "trueresponse_exact": question["exact_answer"],
-            "ragresponse": response,
+            "questionid": question["id"],  # question ID
+            "querytype": question["type"],  # question type
+            "question": question["body"],  # question
+            "trueresponse_exact": question["exact_answer"],  # groundtruth answer
+            "ragresponse": response,  #
             "answered_correct": answered_correct,
-            "pubmedids_retrieved": k_pubmedids,
-            "pubmedids_uses_by_rag": used_pubmedids,
-            "pubmedids_ground_truth": ground_truth_ids,
+            "pmids_retrieved": k_pubmedids,
+            "pmids_uses_by_rag": used_pubmedids,
+            "pmids_ground_truth": ground_truth_ids,
             "requestime": elapsed_time,
         }
 
