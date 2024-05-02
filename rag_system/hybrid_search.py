@@ -22,7 +22,7 @@ class hybridRertiever:
         elif encoder_type == 2:
             self.text_encoder = TextEncooderLinkBioBERT()
 
-    def retrieve_vecs(self, query: str, k: int = 100):
+    def retrieve_vecs(self, query: str, k: int = 1000):
         es_query = {
             "size": k,
             "query": {
