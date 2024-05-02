@@ -2,7 +2,7 @@ import json
 from openAI_chat import Chat
 from semantic_search_bioBERT import bioBERTretriever
 from BM25_search import BM25retriever
-from hybrid_search import hybridRertiever # not finished yet
+from hybrid_search import HybridRetriever
 
 class RAG:
     def __init__(self, retriever=1, question_type=1, n_docs=10):
@@ -11,7 +11,7 @@ class RAG:
         elif retriever == 2:
             self.retriever = BM25retriever()
         elif retriever == 3:
-            self.retriever = hybridRertiever()
+            self.retriever = HybridRetriever()
         else:
             raise ValueError("Invalid retriever value. Choose 1 for bioBERT, 2 for BM25, or 3 for hybrid.")
 

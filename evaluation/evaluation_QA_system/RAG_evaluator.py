@@ -3,6 +3,8 @@ from tqdm import tqdm
 import re
 import json
 import sys
+import pandas as pd
+from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 
 # Navigate up from 'dataset_filter' to 'evaluation', then 'information_retrieval', and up to the root
 # Then access the 'rag_system' directory
@@ -183,6 +185,7 @@ class RAG_evaluator:
         percentage_correct_answers = 100 if answered_correct else 0
 
         return answered_correct, percentage_correct_answers
+    
 
     def compare_pubmed_ids(self, pubmed_ids, documents):
         """
@@ -215,3 +218,43 @@ class RAG_evaluator:
         num_correct_pubmed = len(matched_ids)
 
         return correct_pubmed, num_correct_pubmed, matched_ids
+
+    @staticmethod
+    def analyze_performance(json_file_path):
+        # Load the JSON data
+        with open(json_file_path, "r") as file:
+            data = json.load(file)
+
+        # Convert JSON data into a DataFrame
+        df = pd.DataFrame(data)
+
+        # extract the retriever number from the file path
+        retriever = re.search(r"ragver_(\d+)", json_file_path).group(1)
+        print(f'Summary Statistics for RAG with retriever {retriever}')
+        print(f"Total Questions: {len(df)}")
+
+        # Calculate mean and standard deviation for the response time
+        mean_response_time = df['requestime'].mean()
+        sd_response_time = df['requestime'].std()
+        print("\nResponse Time:")
+        print("Mean: {:.2f} seconds".format(mean_response_time))
+        print("Standard Deviation: {:.2f} seconds".format(sd_response_time))
+
+        # Calculate accuracy, recall, precision, and F1-score
+        # Assuming 'actual' and 'predicted' are the column names for your true and predicted binary classification outcomes
+        accuracy = accuracy_score(df['trueresponse_exact'], df['ragresponse'])
+        recall = recall_score(df['trueresponse_exact'], df['ragresponse'], average='macro', zero_division=0)
+        precision = precision_score(df['trueresponse_exact'], df['ragresponse'], average='macro', zero_division=0)
+        f1 = f1_score(df['trueresponse_exact'], df['ragresponse'], average='macro', zero_division=0)
+
+        print("\nClassification Metrics:")
+        print("Accuracy: {:.2f}".format(accuracy))
+        print("Recall: {:.2f}".format(recall))
+        print("Precision: {:.2f}".format(precision))
+        print("F1 Score: {:.2f}".format(f1))
+
+        # Additional summary statistics for other data aspects
+        print("\nAdditional Summary Statistics:")
+        print("Average Number of PubMed IDs Returned: {:.2f}".format(df['numb_of_pubmedid_returned'].mean()))
+        print("Average Number of PubMed IDs Retrieved: {:.2f}".format(df['num_of_pubmedid_retrieved'].mean()))
+

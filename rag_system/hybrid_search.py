@@ -4,8 +4,9 @@ import json
 from bioBERTencoder import TextEncooderBioBERT
 from linkBioBERTencoder import TextEncooderLinkBioBERT
 import numpy as np
+import time
 
-class hybridRertiever:
+class HybridRetriever:
     def __init__(self, encoder_type: int = 1):
         elastic_password = os.getenv('ELASTIC_PASSWORD')
         self.es = Elasticsearch(
@@ -65,10 +66,13 @@ class hybridRertiever:
         return self.es.search(index=self.index, body=query)
     
     def retrieve_docs(self, query: str, return_k: int = 10, search_k: int = 1000):
+        # time every method call
+        
         embeddings, PMIDS = self.retrieve_vecs(query, search_k)
         query_vector = self.text_encoder.embed(query)
         top_PMIDs = self.rank_vectors_dot_product(query_vector, embeddings, PMIDS, return_k)
         es_response = self.get_docs_via_PMIDs(top_PMIDs)
+
         results = {}
 
         for idx, hit in enumerate(es_response['hits']['hits'], 1):
@@ -80,7 +84,3 @@ class hybridRertiever:
             }
 
         return json.dumps(results, indent=4)
-
-
-    
-
