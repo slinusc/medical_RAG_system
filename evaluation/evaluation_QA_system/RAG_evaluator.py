@@ -23,10 +23,11 @@ class RAG_evaluator:
         output_path (str): Path where the output results will be written in JSON format.
     """
 
-    def __init__(self, path_to_question_json, output_path):
+    def __init__(self, path_to_question_json, output_path, Multiplechoice=False):
         # Initialization can be used to set up necessary variables or states
         self.path_to_jsonfile = path_to_question_json
         self.output_path = output_path
+        self.multiple_choice = Multiplechoice
         """
         Initializes the RAG_evaluator with the specified paths for the question JSON file and the output file.
 
@@ -84,16 +85,80 @@ class RAG_evaluator:
 
         # be aware that in the current implementation only yesno and list questions are answered
         # we transfered tje logic into the match case  to reduce api requests
-        match question["type"]:
-            case "yesno":
+        #here we select between the file format of the QA and multiple choice dataset
+        if self.multiple_choice == False:
+            match question["type"]:
+                case "yesno":
 
-                # Method to evaluate  based on the query type
+                    # Method to evaluate  based on the query type
+                    rag = RAG(retriever=retriever_type, question_type=2)
+                    # time request
+                    start_time = time.time()
+                    rag_answer = rag.get_answer(
+                        question["body"]
+                    )  # dummy_request(question["body"],question["type"])
+                    # Stop timing
+                    end_time = time.time()
+
+                    try:
+                        # typecast string into json object
+                        rag_answer = json.loads(rag_answer)
+                        # Extracting the necessary information if the keys are present
+                        response = rag_answer.get("response")
+                        k_pubmedids = rag_answer["retrieved_PMIDs"]
+                        used_pubmedids = rag_answer["used_PMIDs"]
+                        # Calculate elapsed time in seconds
+                        elapsed_time = end_time - start_time
+
+                        ground_truth_ids = self.extraxt_pubmedid(question["documents"])
+
+                    except Exception as e:
+                        print(question["body"])
+                        print("caused the following error:")
+                        print(e)
+                        return None
+
+                    answered_correct, percentage_correct_answers = self.yesno_eval(
+                        response, question["exact_answer"]
+                    )
+                case "summary":
+                    return None
+                    # currently we dont evaluate summary responses
+                case "factoid":
+                    # currently we dont evaluate factoid responses
+
+                    return None
+                case "list":
+                    # currently we dont evaluate summary responses
+
+                    return None
+
+                case _:
+                    return None
+
+            return {
+                "questionid": question["id"],  # question ID
+                "querytype": question["type"],  # question type
+                "question": question["body"],  # question
+                "trueresponse_exact": question["exact_answer"],  # groundtruth answer
+                "ragresponse": response,  #
+                "answered_correct": answered_correct,
+                "pmids_retrieved": k_pubmedids,
+                "pmids_uses_by_rag": used_pubmedids,
+                "pmids_ground_truth": ground_truth_ids,
+                "requestime": elapsed_time,
+            }
+        #now we handle the case of multiple choice datasets
+        else:
+         
+
+                 # Method to evaluate  based on the query type
                 rag = RAG(retriever=retriever_type, question_type=2)
                 # time request
                 start_time = time.time()
                 rag_answer = rag.get_answer(
                     question["body"]
-                )  # dummy_request(question["body"],question["type"])
+                 )  # dummy_request(question["body"],question["type"])
                 # Stop timing
                 end_time = time.time()
 
@@ -110,41 +175,28 @@ class RAG_evaluator:
                     ground_truth_ids = self.extraxt_pubmedid(question["documents"])
 
                 except Exception as e:
-                    print(question["body"])
-                    print("caused the following error:")
-                    print(e)
-                    return None
+                        print(question["body"])
+                        print("caused the following error:")
+                        print(e)
+                        return None
 
                 answered_correct, percentage_correct_answers = self.yesno_eval(
-                    response, question["exact_answer"]
-                )
-            case "summary":
-                return None
-                # currently we dont evaluate summary responses
-            case "factoid":
-                # currently we dont evaluate factoid responses
+                        response, question["exact_answer"]
+                    )
+ 
 
-                return None
-            case "list":
-                # currently we dont evaluate summary responses
-
-                return None
-
-            case _:
-                return None
-
-        return {
-            "questionid": question["id"],  # question ID
-            "querytype": question["type"],  # question type
-            "question": question["body"],  # question
-            "trueresponse_exact": question["exact_answer"],  # groundtruth answer
-            "ragresponse": response,  #
-            "answered_correct": answered_correct,
-            "pmids_retrieved": k_pubmedids,
-            "pmids_uses_by_rag": used_pubmedids,
-            "pmids_ground_truth": ground_truth_ids,
-            "requestime": elapsed_time,
-        }
+            return {
+                "questionid": question["id"],  # question ID
+                "querytype": question["type"],  # question type
+                "question": question["body"],  # question
+                "trueresponse_exact": question["exact_answer"],  # groundtruth answer
+                "ragresponse": response,  #
+                "answered_correct": answered_correct,
+                "pmids_retrieved": k_pubmedids,
+                "pmids_uses_by_rag": used_pubmedids,
+                "pmids_ground_truth": ground_truth_ids,
+                "requestime": elapsed_time,
+            }
 
     def yesno_eval(self, rag_response, true_response):
         """
