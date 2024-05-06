@@ -6,11 +6,11 @@ import pandas as pd
 app = Flask(__name__)
 
 # Load the Faiss index (assuming the index has already been created and saved)
-index_path = "/app/faiss_indices/bioBERT_index.index"
+index_path = "/app/faiss_indices/medCPT_index.index"
 index = faiss.read_index(index_path)
 
 # Load PMIDs and their respective index numbers
-pmids_path = "/app/PMIDs/bioBERT_pmids.csv"
+pmids_path = "/app/PMIDs/medCPT_pmids.csv"
 pmids_df = pd.read_csv(pmids_path)
 
 # Create a dictionary to map index numbers to PMIDs
@@ -35,4 +35,4 @@ def search():
     return jsonify(PMIDs=matched_PMIDs, distances=distances.tolist())
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)  # Accessible over port 5000 on all network interfaces
+    app.run(host='0.0.0.0', port=5001)  # Accessible over port 5000 on all network interfaces

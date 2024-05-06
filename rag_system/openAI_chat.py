@@ -14,15 +14,16 @@ class Chat:
         base_context = (
             "You are a sophisticated medical assistant designed to synthesize responses "
             "from specific medical documents. Only use the information provided in the "
-            "documents to answer questions. "
+            "documents to answer questions. The first documents should be the most relevant."
+            "Do not use any other information except for the documents provided."
             "When answering questions, always format your response "
             "as a JSON object with fields for 'response', 'used_PMIDs'. "
-            "Cite all relevant PMIDs in your responses."
+            "Cite all PMIDs your response is based on in the 'used_PMIDs' field."
         )
 
         question_specific_context = {
             1: " Provide a detailed or binary response according to the question's requirement.",
-            2: " Response should be 'yes', 'no', or 'no_docs_found'."
+            2: " Response should be 'yes', 'no', or 'no_docs_found' if no relevant documents are found.",
         }
 
         return base_context + question_specific_context.get(question_type, "")
