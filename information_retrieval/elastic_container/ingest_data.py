@@ -78,10 +78,6 @@ def bulk_index_documents(source_directory, index_name, error_log_path):
                         try:
                             doc = json.loads(line)
                             
-                            # Remove the "embeddings" field from the document
-                            #if "embeddings" in doc:
-                            #    del doc["embeddings"]
-                            
                             action = {
                                 "_index": index_name,
                                 "_source": doc

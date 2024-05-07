@@ -21,7 +21,7 @@ class TextEncooderBioBERT:
 
         self.model = SentenceTransformer(modules=[word_embedding_model, pooling_model], device=self.device)
 
-    def embed(self, text):
+    def encode(self, text):
         # transform text into vector representation
         embedding = self.model.encode([text], batch_size=1, show_progress_bar=False)
         return embedding[0]
