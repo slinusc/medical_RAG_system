@@ -1,8 +1,7 @@
 Here is our current file structure.
 ```
-.
 ├── evaluation
-│   ├── data_storage
+│   ├── evaluation_data_storages
 │   │   ├── documentation.md
 │   │   ├── elasticsearch
 │   │   │   ├── elastic.ipynb
@@ -14,13 +13,12 @@ Here is our current file structure.
 │   │   └── mongodb
 │   │       ├── eval_mongo.ipynb
 │   │       └── mongoDB.ipynb
-│   └── retriever
+│   └── evaluation_QA_system
 │       ├── dataset_filter
 │       │   ├── filter_data.ipynb
 │       │   └── Q&A.py
-│       ├── questions_explorer
-│       │   ├── evaluate_response.ipynb
-│       │   └── explore_questions.ipynb
+│       ├── evaluation_pipeline.ipynb
+│       ├── explore_questions.ipynb
 │       └── RAG_evaluator.py
 ├── information_retrieval
 │   ├── document_encoding
@@ -40,6 +38,8 @@ Here is our current file structure.
 │   ├── BM25_search.py
 │   ├── hybrid_search.py
 │   ├── linkBioBERTencoder.py
+│   ├── medCPTEncoder.py
+│   ├── medCPTRetriever.py
 │   ├── openAI_chat.py
 │   ├── pipe.drawio.png
 │   ├── pipeline.ipynb
@@ -66,8 +66,7 @@ Here is our current file structure.
         ├── chat.html
         └── login_page.html
 
-20 directories, 44 files
-
+19 directories, 46 files
 
 
 ```
