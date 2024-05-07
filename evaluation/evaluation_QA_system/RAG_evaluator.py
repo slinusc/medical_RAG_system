@@ -10,10 +10,6 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_sc
 # Then access the 'rag_system' directory
 sys.path.append("../../rag_system/")
 
-# Import the module
-from RAG import RAG
-
-
 class RAG_evaluator:
     """
     This class is designed to evaluate the performance of a Retrieval-Augmented Generation (RAG) system by processing a set of questions provided in a JSON file. It supports handling different types of questions, evaluates the accuracy of the RAG's responses, and measures the system's effectiveness in retrieving relevant documents.
@@ -23,8 +19,9 @@ class RAG_evaluator:
         output_path (str): Path where the output results will be written in JSON format.
     """
 
-    def __init__(self, path_to_question_json, output_path, Multiplechoice=False):
+    def __init__(self, rag_model, path_to_question_json, output_path, Multiplechoice=False):
         # Initialization can be used to set up necessary variables or states
+        self.rag_model = rag_model
         self.path_to_jsonfile = path_to_question_json
         self.output_path = output_path
         self.multiple_choice = Multiplechoice
@@ -58,24 +55,13 @@ class RAG_evaluator:
                 response = self.request_selector(question, retriever_type)
                 if response is not None:
                     results.append(response)
-            #       iter = iter + 1
-            #      if iter%10 == 0: #keep track how many iterations where done
-            #              print(iter)
-            #      if iter > 20:
-
-            #          break
         else:
             for question in tqdm(data, desc="Processing questions"):
                 # response = self.request_selector(question['id'], question['type'])
                 response = self.request_selector(question, retriever_type)
                 if response is not None:
                     results.append(response)
-            #       iter = iter + 1
-            #      if iter%10 == 0: #keep track how many iterations where done
-            #              print(iter)
-            #      if iter > 20:
 
-            #          break
         # Write the results to the output JSON file
         with open(self.output_path, "w") as file:
             json.dump(results, file, indent=4)
@@ -103,11 +89,9 @@ class RAG_evaluator:
             match question["type"]:
                 case "yesno":
 
-                    # Method to evaluate  based on the query type
-                    rag = RAG(retriever=retriever_type, question_type=2)
                     # time request
                     start_time = time.time()
-                    rag_answer = rag.get_answer(
+                    rag_answer = self.rag_model.get_answer(
                         question["body"]
                     )  # dummy_request(question["body"],question["type"])
                     # Stop timing
@@ -343,10 +327,5 @@ class RAG_evaluator:
         print(
             "Average Number of PubMed IDs Returned: {:.2f}".format(
                 df["numb_of_pubmedid_returned"].mean()
-            )
-        )
-        print(
-            "Average Number of PubMed IDs Retrieved: {:.2f}".format(
-                df["num_of_pubmedid_retrieved"].mean()
             )
         )
