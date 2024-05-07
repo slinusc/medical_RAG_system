@@ -51,18 +51,31 @@ class RAG_evaluator:
         # amount of requests send
         # iter = 0
         # Process each question and display progress
-        for question in tqdm(data["questions"], desc="Processing questions"):
-            # response = self.request_selector(question['id'], question['type'])
-            response = self.request_selector(question, retriever_type)
-            if response is not None:
-                results.append(response)
-        #       iter = iter + 1
-        #      if iter%10 == 0: #keep track how many iterations where done
-        #              print(iter)
-        #      if iter > 20:
+        # since both data sets have different file strucutres we must differentiate here ibetween them
+        if self.multiple_choice == False:
+            for question in tqdm(data["questions"], desc="Processing questions"):
+                # response = self.request_selector(question['id'], question['type'])
+                response = self.request_selector(question, retriever_type)
+                if response is not None:
+                    results.append(response)
+            #       iter = iter + 1
+            #      if iter%10 == 0: #keep track how many iterations where done
+            #              print(iter)
+            #      if iter > 20:
 
-        #          break
+            #          break
+        else:
+            for question in tqdm(data, desc="Processing questions"):
+                # response = self.request_selector(question['id'], question['type'])
+                response = self.request_selector(question, retriever_type)
+                if response is not None:
+                    results.append(response)
+            #       iter = iter + 1
+            #      if iter%10 == 0: #keep track how many iterations where done
+            #              print(iter)
+            #      if iter > 20:
 
+            #          break
         # Write the results to the output JSON file
         with open(self.output_path, "w") as file:
             json.dump(results, file, indent=4)
