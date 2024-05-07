@@ -16,7 +16,9 @@ class RAG_evaluator:
         output_path (str): Path where the output results will be written in JSON format.
     """
 
-    def __init__(self, rag_model, path_to_question_json, output_path, Multiplechoice=False):
+    def __init__(
+        self, rag_model, path_to_question_json, output_path, Multiplechoice=False
+    ):
         # Initialization can be used to set up necessary variables or states
         self.rag_model = rag_model
         self.path_to_jsonfile = path_to_question_json
@@ -52,6 +54,9 @@ class RAG_evaluator:
                 response = self.request_selector(question, retriever_type)
                 if response is not None:
                     results.append(response)
+                    # iter = iter + 1
+                    # if iter > 10:
+                    #    break
         else:
             for question in tqdm(data, desc="Processing questions"):
                 # response = self.request_selector(question['id'], question['type'])
@@ -107,7 +112,18 @@ class RAG_evaluator:
                         elapsed_time = end_time - start_time
 
                         ground_truth_ids = self.extraxt_pubmedid(question["documents"])
-
+                        (
+                            retrieved_correct_ids,
+                            num_correct_retrived_ids,
+                            matching_retrieved_ids,
+                        ) = self.compare_pubmed_ids(k_pubmedids, question["documents"])
+                        (
+                            rag_used_correct_ids,
+                            rag_used_num_correct_retrived_ids,
+                            rag_used_matching_retrieved_ids,
+                        ) = self.compare_pubmed_ids(
+                            used_pubmedids, question["documents"]
+                        )
                     except Exception as e:
                         print(question["body"])
                         print("caused the following error:")
@@ -137,11 +153,17 @@ class RAG_evaluator:
                 "querytype": question["type"],  # question type
                 "question": question["body"],  # question
                 "trueresponse_exact": question["exact_answer"],  # groundtruth answer
-                "ragresponse": response,  #
-                "answered_correct": answered_correct,
-                "pmids_retrieved": k_pubmedids,
-                "pmids_uses_by_rag": used_pubmedids,
-                "pmids_ground_truth": ground_truth_ids,
+                "ragresponse": response,  # response of the rag
+                "answered_correct": answered_correct,  # groundtruth / correct answer
+                "pmids_retrieved": k_pubmedids,  # the pubmedids that where retrived
+                "pmids_uses_by_rag": used_pubmedids,  #  the pubmedids that where actually used
+                "pmids_ground_truth": ground_truth_ids,  # the pubmed ids that are the ideal answer
+                "retreived_correct_pubmedid": retrieved_correct_ids,  # bool, wether or not any correct pubmed ids where retrived
+                "num_correct_retrieved_ids": num_correct_retrived_ids,  # numeric. number of pubmed ids correctly retrieved
+                "matching_retrieved_ids": matching_retrieved_ids,  # numeric, correctly used pubmedids retrieved
+                "rag_used_correct_ids": rag_used_correct_ids,  # bool, wether or not any current pubmedid was used by the rag
+                "rag_used_num_correct_retrived_ids": rag_used_num_correct_retrived_ids,  # numeric, numer of pubmed ids correctly used by the rag
+                "rag_used_matching_retrieved_ids": rag_used_matching_retrieved_ids,  # numeric pubmedids that where correclty used
                 "requestime": elapsed_time,
             }
         # now we handle the case of multiple choice datasets
