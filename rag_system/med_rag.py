@@ -1,4 +1,5 @@
 import json
+import time
 from openAI_chat import Chat
 from bioBERT_retriever import BioBERTRetriever
 from bm25_retriever import BM25Retriever
@@ -26,14 +27,29 @@ class MedRAG:
         return [doc["PMID"] for doc in docs.values()]
 
     def get_answer(self, question: str) -> str:
+
+        # retrieve the documents timing the retrieval
+        start_time_retrieval = time.time()
         retrieved_docs = json.loads(self.retriever.retrieve_docs(question, self.n_docs))
+        end_time_retrieval = time.time()
+
+        # extract the PMIDs from the retrieved documents
         pmids = self.extract_pmids(retrieved_docs)
-        # the chat response is a json string {'response': '...', 'used_PMIDs': [...]}
+
+        # the chat response is a json string {'response': '...', 'used_PMIDs': [...]} and timing the generation
+        start_time_generation = time.time()
         answer = self.chat.create_chat(question, retrieved_docs)
+        end_time_generation = time.time()
+
+        retrieval_time = end_time_retrieval - start_time_retrieval
+        generation_time = end_time_generation - start_time_generation
+
         # now adding the retrieved PMIDs to the response
         try :
             answer = json.loads(answer)
             answer['retrieved_PMIDs'] = pmids
+            answer['retrieval_time'] = retrieval_time
+            answer['generation_time'] = generation_time
         except:
             return None
         return json.dumps(answer)
