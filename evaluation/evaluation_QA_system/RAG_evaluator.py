@@ -154,15 +154,23 @@ class RAG_evaluator:
                 ].lower(),  # groundtruth answer
                 "ragresponse": response.lower(),  # response of the rag
                 "answered_correct": answered_correct,  # groundtruth / correct answer
-                "pmids_retrieved": k_pubmedids,  # the pubmedids that where retrived
-                "pmids_uses_by_rag": used_pubmedids,  #  the pubmedids that where actually used
+                "pmids_retrieved": str(
+                    k_pubmedids
+                ),  # the pubmedids that where retrived
+                "pmids_uses_by_rag": str(
+                    used_pubmedids
+                ),  #  the pubmedids that where actually used
                 "pmids_ground_truth": ground_truth_ids,  # the pubmed ids that are the ideal answer
                 "retreived_correct_pubmedid": retrieved_correct_ids,  # bool, wether or not any correct pubmed ids where retrived
                 "num_correct_retrieved_ids": num_correct_retrived_ids,  # numeric. number of pubmed ids correctly retrieved
-                "matching_retrieved_ids": matching_retrieved_ids,  # numeric, correctly used pubmedids retrieved
+                "matching_retrieved_ids": str(
+                    matching_retrieved_ids
+                ),  # numeric, correctly used pubmedids retrieved
                 "rag_used_correct_ids": rag_used_correct_ids,  # bool, wether or not any current pubmedid was used by the rag
                 "rag_used_num_correct_retrived_ids": rag_used_num_correct_retrived_ids,  # numeric, numer of pubmed ids correctly used by the rag
-                "rag_used_matching_retrieved_ids": rag_used_matching_retrieved_ids,  # numeric pubmedids that where correclty used
+                "rag_used_matching_retrieved_ids": str(
+                    rag_used_matching_retrieved_ids
+                ),  # numeric pubmedids that where correclty used
                 "requestime": elapsed_time,  # time used for the entire request
                 "retrievment_time": retriever_time,  # time used for retrievment
                 "generation_time": generation_time,  # time used for generation
@@ -173,12 +181,12 @@ class RAG_evaluator:
             # time request
             start_time = time.time()
             rag_answer = self.rag_model.get_answer(
-                question["question"],
-                question["opa"],
-                question["opb"],
-                question["opc"],
-                question["opd"],
-            )  # dummy_request(question["body"],question["type"])
+                f"{question['question']} \n"
+                f"1: {question['opa']} \n"
+                f"2: {question['opb']} \n"
+                f"3: {question['opc']} \n"
+                f"4: {question['opd']}"
+            )
             # Stop timing
             end_time = time.time()
 
@@ -211,8 +219,8 @@ class RAG_evaluator:
             "trueresponse_exact": question["cop"],  # groundtruth answer
             "ragresponse": response,  #
             "answered_correct": answered_correct,
-            "pmids_retrieved": k_pubmedids,
-            "pmids_uses_by_rag": used_pubmedids,
+            "pmids_retrieved": str(k_pubmedids),
+            "pmids_uses_by_rag": str(used_pubmedids),
             "pmids_ground_truth": ground_truth_ids,
             "requestime": elapsed_time,
             "retrievment_time": retriever_time,  # time used for retrievment
@@ -220,10 +228,14 @@ class RAG_evaluator:
         }
 
     def evaluate_MEDMCQA(self, rag_response, true_response):
-        if rag_response.isdigit() == true_response.isdigit():
-            return True
-        else:
-            return False
+        try:
+            if int(rag_response) == int(true_response):
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return None
 
     def yesno_eval(self, rag_response, true_response):
         """
@@ -358,9 +370,30 @@ class RAG_evaluator:
             average="weighted",
             zero_division=0,
         )
+        # count the nuber of no answer given
+        count_no_docs_found = (df["ragresponse"] == "no_docs_found").sum()
+        count_five = (df["ragresponse"] == 5).sum()
+        # Total specific counts
+        total_specific_counts = count_no_docs_found + count_five
 
+        # Total rows in the DataFrame
+        total_rows = len(df)
+
+        # Calculate percentages
+        percentage_not_answered = (total_specific_counts / total_rows) * 100
+        # Print or save the results
+        print("summary of non answered questions:\n")
+        print(f"Absolute count - No Docs Found: {total_specific_counts}")
+        print(f"Percentage - No Docs Found: {percentage_not_answered:.2f}%")
         print("\nClassification Metrics:")
         print("Accuracy: {:.2f}".format(accuracy))
         print("Recall: {:.2f}".format(recall))
         print("Precision: {:.2f}".format(precision))
         print("F1 Score: {:.2f}".format(f1))
+        print("additional metrics:\n")
+        print("mean response time overall:\n")
+        print(df["requestime"].mean())
+        print("mean response time retriever:\n")
+        print(df["retrievment_time"].mean())
+        print("mean response time generation:\n")
+        print(df["generation_time"].mean())
