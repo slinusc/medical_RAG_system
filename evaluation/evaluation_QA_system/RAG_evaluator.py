@@ -100,7 +100,9 @@ class RAG_evaluator:
                         # Extracting the necessary information if the keys are present
                         response = rag_answer.get("response")
                         k_pubmedids = rag_answer["retrieved_PMIDs"]
+                        k_pubmedids = [str(i) for i in k_pubmedids] # garantee that the ids are strings
                         used_pubmedids = rag_answer["used_PMIDs"]
+                        used_pubmedids = [str(i) for i in used_pubmedids] # garantee that the ids are strings
                         # Calculate elapsed time in seconds
                         elapsed_time = end_time - start_time
 
