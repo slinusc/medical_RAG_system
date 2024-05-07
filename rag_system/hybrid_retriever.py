@@ -1,13 +1,10 @@
 from elasticsearch import Elasticsearch
 import os
 import json
-from bioBERT_encoder import QueryEncooderBioBERT
-from linkBioBERT_encoder import QueryEncooderLinkBioBERT
-import numpy as np
-import time
+from medCPT_encoder import MedCPTCrossEncoder
 
 class HybridRetriever:
-    def __init__(self, encoder_type: int = 1):
+    def __init__(self):
         elastic_password = os.getenv('ELASTIC_PASSWORD')
         self.es = Elasticsearch(
             ['https://localhost:9200'],
@@ -16,71 +13,61 @@ class HybridRetriever:
             ca_certs="/home/ubuntu/.crts/http_ca.crt",
             request_timeout=60
         )
-        self.index = "pubmed_index_embedded"
-        self.faiss_url = "http://localhost:5000/search"
-        if encoder_type == 1:
-            self.text_encoder = QueryEncooderBioBERT()
-        elif encoder_type == 2:
-            self.text_encoder = QueryEncooderLinkBioBERT()
+        self.index = "pubmed_index"
+        self.reranker = MedCPTCrossEncoder()
 
-    def retrieve_vecs(self, query: str, k: int = 1000):
+    def rerank_docs(self, query: str, docs: list):
+        """Reranks the documents based on their relevance to the query."""
+        scores = self.reranker.score(docs, query)
+        reranked_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
+        return reranked_docs
+
+    def retrieve_docs(self, query: str, top_n: int = 10, k: int = 100):
+        """Retrieves documents from Elasticsearch and reranks them, returning only the top N results."""
         es_query = {
             "size": k,
             "query": {
                 "match": {
-                    "content": query 
-                }
-            },
-            "_source": ["PMID", "embeddings"]
-        }
-        es_response = self.es.search(index=self.index, body=es_query)
-        PMIDs = [hit['_source']['PMID'] for hit in es_response['hits']['hits']]
-        embeddings = [hit['_source']['embeddings'] for hit in es_response['hits']['hits']]
-        return embeddings, PMIDs
-
-    def query_to_vector(self, text: str):
-        """Converts text query to a vector using the BioBERT encoder."""
-        embedding = self.text_encoder.embed(text)
-        return embedding
-
-    @staticmethod
-    def rank_vectors_dot_product(query_vector, vector_list, PMIDs, k=10):
-        # Compute the dot product of each vector in the list with the query vector
-        dot_products = np.dot(vector_list, query_vector)
-        # Get the indices that would sort the vectors in descending order of dot products
-        sorted_indices = np.argsort(dot_products)[::-1]
-        # Return the PMIDs of the top-k vectors, sorted by the computed dot products
-        return [PMIDs[i] for i in sorted_indices[:k]]
-    
-    def get_docs_via_PMIDs(self, PMIDs: list):
-        """Retrieves documents from Elasticsearch using a list of PMIDs."""
-        query = {
-            "size": len(PMIDs),
-            "query": {
-                "terms": {
-                    "PMID": PMIDs
+                    "content": query
                 }
             },
             "_source": ["PMID", "title", "content"]
         }
-        return self.es.search(index=self.index, body=query)
-    
-    def retrieve_docs(self, query: str, return_k: int = 10, search_k: int = 1000):
-        # time every method call
-        
-        embeddings, PMIDS = self.retrieve_vecs(query, search_k)
-        query_vector = self.text_encoder.embed(query)
-        top_PMIDs = self.rank_vectors_dot_product(query_vector, embeddings, PMIDS, return_k)
-        es_response = self.get_docs_via_PMIDs(top_PMIDs)
+        # Execute the search query
+        response = self.es.search(index=self.index, body=es_query)
 
-        results = {}
-
-        for idx, hit in enumerate(es_response['hits']['hits'], 1):
-            doc_key = f"doc{idx}"
-            results[doc_key] = {
+        # Extract documents
+        docs = [hit['_source']['content'] for hit in response['hits']['hits']]
+        initial_results = {
+            f"doc{idx + 1}": {
                 'PMID': hit['_source']['PMID'],
                 'title': hit['_source']['title'],
                 'content': hit['_source']['content']
             }
+            for idx, hit in enumerate(response['hits']['hits'])
+        }
+
+        # Rerank the documents
+        reranked_docs = self.rerank_docs(query, docs)
+
+        # Take only the top N reranked documents
+        top_reranked_docs = reranked_docs[:top_n]
+
+        # Construct the final results with reranked scores
+        results = {
+            f"doc{idx + 1}": {
+                'PMID': response['hits']['hits'][idx]['_source']['PMID'],
+                'title': response['hits']['hits'][idx]['_source']['title'],
+                'content': doc,
+                'score': score.item()
+            }
+            for idx, (doc, score) in enumerate(top_reranked_docs)
+        }
 
         return json.dumps(results, indent=4)
+
+if __name__ == "__main__":
+    retriever = HybridRetriever()
+    query = "Is Alzheimer's disease hereditary?"
+    results = retriever.retrieve_docs(query, k=100, top_n=10)
+    print(results)
