@@ -36,7 +36,7 @@ class MedCPTCrossEncoder:
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    def score(self, articles, query, num_articles=2):
+    def score(self, articles, query):
         pairs = [[query, article] for article in articles]
 
         with torch.no_grad():
@@ -53,7 +53,7 @@ class MedCPTCrossEncoder:
 
 
 if __name__ == "__main__":
-    query_encoder = MedCPTQueryEncoder()
+    
     cross_encoder = MedCPTCrossEncoder()
 
     query = "What is the treatment for diabetes?"

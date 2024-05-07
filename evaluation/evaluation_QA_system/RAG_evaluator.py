@@ -6,9 +6,6 @@ import sys
 import pandas as pd
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 
-# Navigate up from 'dataset_filter' to 'evaluation', then 'information_retrieval', and up to the root
-# Then access the 'rag_system' directory
-sys.path.append("../../rag_system/")
 
 
 class RAG_evaluator:
@@ -339,11 +336,3 @@ class RAG_evaluator:
         print("Recall: {:.2f}".format(recall))
         print("Precision: {:.2f}".format(precision))
         print("F1 Score: {:.2f}".format(f1))
-
-        # Additional summary statistics for other data aspects
-        print("\nAdditional Summary Statistics:")
-        print(
-            "Average Number of PubMed IDs Returned: {:.2f}".format(
-                df["numb_of_pubmedid_returned"].mean()
-            )
-        )
