@@ -19,11 +19,13 @@ class Chat:
             "When answering questions, always format your response "
             "as a JSON object with fields for 'response', 'used_PMIDs'. "
             "Cite all PMIDs your response is based on in the 'used_PMIDs' field."
+            "Please think step-by-step before answering questions and provide the most accurate response possible."
         )
 
         question_specific_context = {
             1: " Provide a detailed or binary response according to the question's requirement.",
-            2: " Response should be 'yes', 'no', or 'no_docs_found' if no relevant documents are found.",
+            2: " Your response should only be 'yes', 'no'. If if no relevant documents are found, return 'no_docs_found'.",
+            3: " Choose between the given options 1 to 4 and return as 'response' the chosen number. If no relevant documents are found, return the number 5.",
         }
 
         return base_context + question_specific_context.get(question_type, "")
