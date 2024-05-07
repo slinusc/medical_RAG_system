@@ -148,11 +148,9 @@ class RAG_evaluator:
         # now we handle the case of multiple choice datasets
         else:
 
-            # Method to evaluate  based on the query type
-            rag = RAG(retriever=retriever_type, question_type=2)
             # time request
             start_time = time.time()
-            rag_answer = rag.get_answer(
+            rag_answer = self.rag_model.get_answer(
                 question["question"],
                 question["opa"],
                 question["opb"],
