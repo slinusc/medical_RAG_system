@@ -156,8 +156,10 @@ class RAG_evaluator:
                 "questionid": question["id"],  # question ID
                 "querytype": question["type"],  # question type
                 "question": question["body"],  # question
-                "trueresponse_exact": question["exact_answer"],  # groundtruth answer
-                "ragresponse": response,  # response of the rag
+                "trueresponse_exact": question[
+                    "exact_answer"
+                ].lower(),  # groundtruth answer
+                "ragresponse": response.lower(),  # response of the rag
                 "answered_correct": answered_correct,  # groundtruth / correct answer
                 "pmids_retrieved": k_pubmedids,  # the pubmedids that where retrived
                 "pmids_uses_by_rag": used_pubmedids,  #  the pubmedids that where actually used
@@ -329,19 +331,19 @@ class RAG_evaluator:
         recall = recall_score(
             df["trueresponse_exact"],
             df["ragresponse"],
-            average="macro",
+            # average="macro",
             zero_division=0,
         )
         precision = precision_score(
             df["trueresponse_exact"],
             df["ragresponse"],
-            average="macro",
+            # average="macro",
             zero_division=0,
         )
         f1 = f1_score(
             df["trueresponse_exact"],
             df["ragresponse"],
-            average="macro",
+            # average="macro",
             zero_division=0,
         )
 
