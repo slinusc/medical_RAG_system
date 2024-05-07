@@ -304,8 +304,25 @@ class RAG_evaluator:
         ]
         return extracted_ids
 
-    @staticmethod
-    def analyze_performance(json_file_path):
+    def manual_accuracy_score(self, y_true, y_pred):
+        # Ensure that y_true and y_pred are the same length
+        if len(y_true) != len(y_pred):
+            raise ValueError(
+                "The length of true labels and predicted labels must be the same."
+            )
+
+        # Calculate the number of correct predictions
+        correct_predictions = sum(
+            1 for true, pred in zip(y_true, y_pred) if true == pred
+        )
+
+        # Calculate accuracy as the ratio of correct predictions to total observations
+        total_predictions = len(y_true)
+        accuracy = correct_predictions / total_predictions
+
+        return accuracy
+
+    def analyze_performance(self, json_file_path):
         # Load the JSON data
         with open(json_file_path, "r") as file:
             data = json.load(file)
@@ -327,23 +344,25 @@ class RAG_evaluator:
 
         # Calculate accuracy, recall, precision, and F1-score
         # Assuming 'actual' and 'predicted' are the column names for your true and predicted binary classification outcomes
-        accuracy = accuracy_score(df["trueresponse_exact"], df["ragresponse"])
+        accuracy = self.manual_accuracy_score(
+            df["trueresponse_exact"], df["ragresponse"]
+        )
         recall = recall_score(
             df["trueresponse_exact"],
             df["ragresponse"],
-            # average="macro",
+            average="weighted",
             zero_division=0,
         )
         precision = precision_score(
             df["trueresponse_exact"],
             df["ragresponse"],
-            # average="macro",
+            average="weighted",
             zero_division=0,
         )
         f1 = f1_score(
             df["trueresponse_exact"],
             df["ragresponse"],
-            # average="macro",
+            average="weighted",
             zero_division=0,
         )
 
