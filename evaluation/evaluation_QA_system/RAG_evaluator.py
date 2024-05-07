@@ -45,7 +45,7 @@ class RAG_evaluator:
         results = []
         # here we implement a variable to limit the amount of request sent for testing purposes uncomment this and line 55 - 60 in order to limit
         # amount of requests send
-        # iter = 0
+        iter = 0
         # Process each question and display progress
         # since both data sets have different file strucutres we must differentiate here ibetween them
         if self.multiple_choice == False:
@@ -54,9 +54,9 @@ class RAG_evaluator:
                 response = self.request_selector(question, retriever_type)
                 if response is not None:
                     results.append(response)
-                    # iter = iter + 1
-                    # if iter > 10:
-                    #    break
+                    iter = iter + 1
+                    if iter > 10:
+                        break
         else:
             for question in tqdm(data, desc="Processing questions"):
                 # response = self.request_selector(question['id'], question['type'])
@@ -104,12 +104,16 @@ class RAG_evaluator:
                         rag_answer = json.loads(rag_answer)
                         # Extracting the necessary information if the keys are present
                         response = rag_answer.get("response")
-                        k_pubmedids = rag_answer["retrieved_PMIDs"]
-                        k_pubmedids = [str(i) for i in k_pubmedids] # garantee that the ids are strings
-                        used_pubmedids = rag_answer["used_PMIDs"]
-                        used_pubmedids = [str(i) for i in used_pubmedids] # garantee that the ids are strings
+                        k_pubmedids = list(map(str, rag_answer["retrieved_PMIDs"]))
+                        # garantee that the ids are strings
+                        used_pubmedids = list(map(str, rag_answer["used_PMIDs"]))
+                        # garantee that the ids are strings
                         # Calculate elapsed time in seconds
                         elapsed_time = end_time - start_time
+                        # get the time it took to retreieve und generate the answer
+                        retriever_time = rag_answer["retrieval_time"]
+
+                        generation_time = rag_answer["generation_time"]
 
                         ground_truth_ids = self.extraxt_pubmedid(question["documents"])
                         (
@@ -164,7 +168,9 @@ class RAG_evaluator:
                 "rag_used_correct_ids": rag_used_correct_ids,  # bool, wether or not any current pubmedid was used by the rag
                 "rag_used_num_correct_retrived_ids": rag_used_num_correct_retrived_ids,  # numeric, numer of pubmed ids correctly used by the rag
                 "rag_used_matching_retrieved_ids": rag_used_matching_retrieved_ids,  # numeric pubmedids that where correclty used
-                "requestime": elapsed_time,
+                "requestime": elapsed_time,  # time used for the entire request
+                "retrievment_time": retriever_time,  # time used for retrievment
+                "generation_time": generation_time,  # time used for generation
             }
         # now we handle the case of multiple choice datasets
         else:
@@ -190,7 +196,9 @@ class RAG_evaluator:
                 used_pubmedids = rag_answer["used_PMIDs"]
                 # Calculate elapsed time in seconds
                 elapsed_time = end_time - start_time
-
+                # get the time it took to retreieve und generate the answer
+                retriever_time = rag_answer["retrieval_time"]
+                generation_time = rag_answer["generation_time"]
                 ground_truth_ids = "none_for_question_type"
 
             except Exception as e:
@@ -212,6 +220,8 @@ class RAG_evaluator:
             "pmids_uses_by_rag": used_pubmedids,
             "pmids_ground_truth": ground_truth_ids,
             "requestime": elapsed_time,
+            "retrievment_time": retriever_time,  # time used for retrievment
+            "generation_time": generation_time,  # time used for generation
         }
 
     def evaluate_MEDMCQA(self, rag_response, true_response):
