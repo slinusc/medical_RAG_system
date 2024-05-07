@@ -5,7 +5,7 @@ import requests
 import json
 
 
-class SemanticRetrieverMedCPT:
+class MedCPTRetriever:
     def __init__(self, rerank=True):
         elastic_password = os.getenv('ELASTIC_PASSWORD')
         self.es = Elasticsearch(
@@ -93,6 +93,6 @@ class SemanticRetrieverMedCPT:
 
 
 if __name__ == "__main__":
-    retriever = SemanticRetrieverMedCPT()
+    retriever = MedCPTRetriever()
     query = "What is the treatment for diabetes?"
     print(retriever.retrieve_docs(query, k=3))

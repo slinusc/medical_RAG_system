@@ -4,7 +4,7 @@ from openAI_chat import Chat
 from bioBERT_retriever import BioBERTRetriever
 from bm25_retriever import BM25Retriever
 from hybrid_retriever import HybridRetriever
-from medCPT_retriever import SemanticRetrieverMedCPT
+from medCPT_retriever import MedCPTRetriever
 
 class MedRAG:
     def __init__(self, retriever=1, question_type=1, n_docs=10):
@@ -15,7 +15,7 @@ class MedRAG:
         elif retriever == 3:
             self.retriever = HybridRetriever()
         elif retriever == 4:
-            self.retriever = SemanticRetrieverMedCPT(rerank=True)
+            self.retriever = MedCPTRetriever(rerank=True)
         else:
             raise ValueError("Invalid retriever value. Choose 1 for bioBERT, 2 for BM25, or 3 for hybrid.")
 

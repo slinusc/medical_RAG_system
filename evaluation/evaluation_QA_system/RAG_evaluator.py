@@ -54,7 +54,7 @@ class RAG_evaluator:
             if response is not None:
                 results.append(response)
                 iter = iter + 1
-                if iter > 10:
+                if iter >= 100:
                     break
 
         # Write the results to the output JSON file
@@ -205,8 +205,6 @@ class RAG_evaluator:
                 ground_truth_ids = "none_for_question_type"
 
             except Exception as e:
-                print(question["body"])
-                print("caused the following error:")
                 print(e)
                 return None
 
@@ -382,7 +380,7 @@ class RAG_evaluator:
         # Calculate percentages
         percentage_not_answered = (total_specific_counts / total_rows) * 100
         # Print or save the results
-        print("summary of non answered questions:\n")
+        print("\nSummary of non answered questions:")
         print(f"Absolute count - No Docs Found: {total_specific_counts}")
         print(f"Percentage - No Docs Found: {percentage_not_answered:.2f}%")
         print("\nClassification Metrics:")
@@ -390,10 +388,7 @@ class RAG_evaluator:
         print("Recall: {:.2f}".format(recall))
         print("Precision: {:.2f}".format(precision))
         print("F1 Score: {:.2f}".format(f1))
-        print("additional metrics:\n")
-        print("mean response time overall:\n")
-        print(df["requestime"].mean())
-        print("mean response time retriever:\n")
-        print(df["retrievment_time"].mean())
-        print("mean response time generation:\n")
-        print(df["generation_time"].mean())
+        print("\nAdditional metrics:")
+        print(f"Mean response time overall: {round(df['requestime'].mean(),2)}")
+        print(f"Mean response time retriever: {round(df['retrievment_time'].mean(),2)}")
+        print(f"Mean response time generation: {round(df['generation_time'].mean(),2)}")
