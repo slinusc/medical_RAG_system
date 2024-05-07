@@ -48,21 +48,14 @@ class RAG_evaluator:
         iter = 0
         # Process each question and display progress
         # since both data sets have different file strucutres we must differentiate here ibetween them
-        if self.multiple_choice == False:
-            for question in tqdm(data["questions"], desc="Processing questions"):
-                # response = self.request_selector(question['id'], question['type'])
-                response = self.request_selector(question)
-                if response is not None:
-                    results.append(response)
-                    iter = iter + 1
-                    if iter > 10:
-                        break
-        else:
-            for question in tqdm(data, desc="Processing questions"):
-                # response = self.request_selector(question['id'], question['type'])
-                response = self.request_selector(question)
-                if response is not None:
-                    results.append(response)
+        for question in tqdm(data["questions"], desc="Processing questions"):
+            # response = self.request_selector(question['id'], question['type'])
+            response = self.request_selector(question)
+            if response is not None:
+                results.append(response)
+                iter = iter + 1
+                if iter > 10:
+                    break
 
         # Write the results to the output JSON file
         with open(self.output_path, "w") as file:
