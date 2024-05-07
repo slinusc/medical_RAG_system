@@ -18,7 +18,7 @@ class MedRAG:
         else:
             raise ValueError("Invalid retriever value. Choose 1 for bioBERT, 2 for BM25, or 3 for hybrid.")
 
-        self.chat = Chat(question_type=question_type)
+        self.chat = Chat(question_type=question_type) # 1 for full text, 2 for yes/no
         self.n_docs = n_docs
 
     def extract_pmids(self, docs):
