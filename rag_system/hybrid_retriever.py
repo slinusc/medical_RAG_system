@@ -18,7 +18,7 @@ class HybridRetriever:
 
     def rerank_docs(self, query: str, docs: list):
         """Reranks the documents based on their relevance to the query."""
-        scores = self.reranker.score(docs, query)
+        scores = self.reranker.score([doc['content'] for doc in docs], query)
         reranked_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
         return reranked_docs
 
@@ -36,16 +36,12 @@ class HybridRetriever:
         # Execute the search query
         response = self.es.search(index=self.index, body=es_query)
 
-        # Extract documents
-        docs = [hit['_source']['content'] for hit in response['hits']['hits']]
-        initial_results = {
-            f"doc{idx + 1}": {
-                'PMID': hit['_source']['PMID'],
-                'title': hit['_source']['title'],
-                'content': hit['_source']['content']
-            }
-            for idx, hit in enumerate(response['hits']['hits'])
-        }
+        # Extract documents with full metadata
+        docs = [{
+            'PMID': hit['_source']['PMID'],
+            'title': hit['_source']['title'],
+            'content': hit['_source']['content']
+        } for hit in response['hits']['hits']]
 
         # Rerank the documents
         reranked_docs = self.rerank_docs(query, docs)
@@ -56,9 +52,9 @@ class HybridRetriever:
         # Construct the final results with reranked scores
         results = {
             f"doc{idx + 1}": {
-                'PMID': response['hits']['hits'][idx]['_source']['PMID'],
-                'title': response['hits']['hits'][idx]['_source']['title'],
-                'content': doc,
+                'PMID': doc['PMID'],
+                'title': doc['title'],
+                'content': doc['content'],
                 'score': score.item()
             }
             for idx, (doc, score) in enumerate(top_reranked_docs)

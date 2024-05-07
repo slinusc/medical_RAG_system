@@ -51,7 +51,7 @@ class SemanticRetrieverMedCPT:
 
     def rerank_docs(self, query: str, docs: list):
         """Reranks the documents based on their relevance to the query."""
-        scores = self.reranker.score(docs, query)
+        scores = self.reranker.score([doc['content'] for doc in docs], query)
         reranked_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
         return reranked_docs
 
@@ -60,35 +60,39 @@ class SemanticRetrieverMedCPT:
         response = self.faiss_request(query, k)
         PMIDs = response['PMIDs'][0]
         es_response = self.get_docs_via_PMIDs(PMIDs)
-        results = {}
 
-        # Format Elasticsearch results
-        for idx, hit in enumerate(es_response['hits']['hits'], 1):
-            doc_key = f"doc{idx}"
-            results[doc_key] = {
-                'PMID': hit['_source']['PMID'],
-                'title': hit['_source']['title'],
-                'content': hit['_source']['content']
-            }
+        docs = [{
+            'PMID': hit['_source']['PMID'],
+            'title': hit['_source']['title'],
+            'content': hit['_source']['content']
+        } for hit in es_response['hits']['hits']]
 
         # Apply reranking if enabled
         if self.rerank_enabled:
-            docs = [hit['_source']['content'] for hit in es_response['hits']['hits']]
             reranked_docs = self.rerank_docs(query, docs)
             results = {
                 f"doc{idx + 1}": {
-                    'PMID': es_response['hits']['hits'][idx]['_source']['PMID'],
-                    'title': es_response['hits']['hits'][idx]['_source']['title'],
-                    'content': doc,
+                    'PMID': doc['PMID'],
+                    'title': doc['title'],
+                    'content': doc['content'],
                     'score': score.item()
                 }
                 for idx, (doc, score) in enumerate(reranked_docs)
+            }
+        else:
+            results = {
+                f"doc{idx + 1}": {
+                    'PMID': doc['PMID'],
+                    'title': doc['title'],
+                    'content': doc['content']
+                }
+                for idx, doc in enumerate(docs)
             }
 
         return json.dumps(results, indent=4)
 
 
 if __name__ == "__main__":
-    retriever = SemanticRetrievermedCPT(rerank=True)
+    retriever = SemanticRetrieverMedCPT()
     query = "What is the treatment for diabetes?"
     print(retriever.retrieve_docs(query, k=3))
