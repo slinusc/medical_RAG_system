@@ -7,7 +7,6 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 
 
-
 class RAG_evaluator:
     """
     This class is designed to evaluate the performance of a Retrieval-Augmented Generation (RAG) system by processing a set of questions provided in a JSON file. It supports handling different types of questions, evaluates the accuracy of the RAG's responses, and measures the system's effectiveness in retrieving relevant documents.
@@ -55,6 +54,9 @@ class RAG_evaluator:
                 response = self.request_selector(question, retriever_type)
                 if response is not None:
                     results.append(response)
+                    # iter = iter + 1
+                    # if iter > 10:
+                    #    break
         else:
             for question in tqdm(data, desc="Processing questions"):
                 # response = self.request_selector(question['id'], question['type'])
