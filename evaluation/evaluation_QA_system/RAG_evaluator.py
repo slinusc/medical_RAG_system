@@ -17,13 +17,13 @@ class RAG_evaluator:
     """
 
     def __init__(
-        self, rag_model, path_to_question_json, output_path, Multiplechoice=False
+        self, rag_model, path_to_question_json, output_path, multiplechoice=False
     ):
         # Initialization can be used to set up necessary variables or states
         self.rag_model = rag_model
         self.path_to_jsonfile = path_to_question_json
         self.output_path = output_path
-        self.multiple_choice = Multiplechoice
+        self.multiple_choice = multiplechoice
         """
         Initializes the RAG_evaluator with the specified paths for the question JSON file and the output file.
 
@@ -32,7 +32,7 @@ class RAG_evaluator:
             output_path (str): Path where the output results will be written in JSON format.
         """
 
-    def run_eval(self, retriever_type=1):
+    def run_eval(self):
         """
         Executes the evaluation of the RAG system by reading the question JSON file, processing each question, and writing the results to the output JSON file. The process includes timing the evaluation and displaying progress.
         """
@@ -51,7 +51,7 @@ class RAG_evaluator:
         if self.multiple_choice == False:
             for question in tqdm(data["questions"], desc="Processing questions"):
                 # response = self.request_selector(question['id'], question['type'])
-                response = self.request_selector(question, retriever_type)
+                response = self.request_selector(question)
                 if response is not None:
                     results.append(response)
                     iter = iter + 1
@@ -60,7 +60,7 @@ class RAG_evaluator:
         else:
             for question in tqdm(data, desc="Processing questions"):
                 # response = self.request_selector(question['id'], question['type'])
-                response = self.request_selector(question, retriever_type)
+                response = self.request_selector(question)
                 if response is not None:
                     results.append(response)
 
@@ -73,7 +73,7 @@ class RAG_evaluator:
         print(f"Results written to {self.output_path}")
         print(f"Processing time: {elapsed_time:.2f} seconds")
 
-    def request_selector(self, question, retriever_type=1):
+    def request_selector(self, question):
         """
         Selects the appropriate RAG model based on the question type and processes the question to get the RAG's response. It also evaluates the correctness of the response and the effectiveness of the document retrieval.
 
