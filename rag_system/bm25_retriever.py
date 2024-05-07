@@ -2,7 +2,7 @@ from elasticsearch import Elasticsearch
 import os
 import json
 
-class BM25retriever:
+class BM25Retriever:
     def __init__(self):
         elastic_password = os.getenv('ELASTIC_PASSWORD')
         self.es = Elasticsearch(

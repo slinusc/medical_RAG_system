@@ -2,9 +2,9 @@ from elasticsearch import Elasticsearch
 import os
 import requests
 import json
-from bioBERTencoder import TextEncooderBioBERT
+from bioBERT_encoder import BioBERTQueryEncooder
 
-class bioBERTretriever:
+class BioBERTRetriever:
     def __init__(self):
         elastic_password = os.getenv('ELASTIC_PASSWORD')
         self.es = Elasticsearch(
@@ -16,11 +16,11 @@ class bioBERTretriever:
         )
         self.index = "pubmed_index"
         self.faiss_url = "http://localhost:5000/search"
-        self.text_encoder = TextEncooderBioBERT()
+        self.query_encoder = BioBERTQueryEncooder()
 
     def query_to_vector(self, text: str):
         """Converts text query to a vector using the BioBERT encoder."""
-        embedding = self.text_encoder.encode(text)
+        embedding = self.query_encoder.encode(text)
         return embedding
 
     def faiss_query(self, query: str, k: int = 10):

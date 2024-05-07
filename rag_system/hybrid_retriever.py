@@ -1,8 +1,8 @@
 from elasticsearch import Elasticsearch
 import os
 import json
-from bioBERTencoder import TextEncooderBioBERT
-from linkBioBERTencoder import TextEncooderLinkBioBERT
+from bioBERT_encoder import QueryEncooderBioBERT
+from linkBioBERT_encoder import QueryEncooderLinkBioBERT
 import numpy as np
 import time
 
@@ -19,9 +19,9 @@ class HybridRetriever:
         self.index = "pubmed_index_embedded"
         self.faiss_url = "http://localhost:5000/search"
         if encoder_type == 1:
-            self.text_encoder = TextEncooderBioBERT()
+            self.text_encoder = QueryEncooderBioBERT()
         elif encoder_type == 2:
-            self.text_encoder = TextEncooderLinkBioBERT()
+            self.text_encoder = QueryEncooderLinkBioBERT()
 
     def retrieve_vecs(self, query: str, k: int = 1000):
         es_query = {

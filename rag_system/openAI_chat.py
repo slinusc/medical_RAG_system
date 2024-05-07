@@ -45,7 +45,7 @@ class Chat:
                 model=self.model,
                 messages=messages,
                 max_tokens=500,
-                temperature=0.2 
+                temperature=0.0
             )
             
             response_content = completion.choices[0].message.content

@@ -1,11 +1,11 @@
-from medCPTEncoder import MedCPTQueryEncoder, MedCPTCrossEncoder
+from medCPT_encoder import MedCPTQueryEncoder, MedCPTCrossEncoder
 from elasticsearch import Elasticsearch
 import os
 import requests
 import json
 
 
-class SemanticRetrievermedCPT:
+class SemanticRetrieverMedCPT:
     def __init__(self, rerank=True):
         elastic_password = os.getenv('ELASTIC_PASSWORD')
         self.es = Elasticsearch(
@@ -26,7 +26,7 @@ class SemanticRetrievermedCPT:
         embedding = self.text_encoder.encode(text)
         return embedding[0]
 
-    def faiss_query(self, query: str, k: int = 100):
+    def faiss_request(self, query: str, k: int = 100):
         """Performs a vector search using FAISS with the given query and k."""
         vec = self.query_to_vector(query).tolist()  # Convert numpy array to list
         data = {
@@ -57,7 +57,7 @@ class SemanticRetrievermedCPT:
 
     def retrieve_docs(self, query: str, k: int = 10):
         """Retrieves documents relevant to the query using both FAISS and Elasticsearch."""
-        response = self.faiss_query(query, k)
+        response = self.faiss_request(query, k)
         PMIDs = response['PMIDs'][0]
         es_response = self.get_docs_via_PMIDs(PMIDs)
         results = {}

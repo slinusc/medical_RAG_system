@@ -3,7 +3,7 @@ import torch
 import time
 
 
-class TextEncooderBioBERT:
+class BioBERTQueryEncooder:
     def __init__(self, model_name='dmis-lab/biobert-v1.1', max_length=512):
         if torch.cuda.is_available():
             self.device = "cuda"

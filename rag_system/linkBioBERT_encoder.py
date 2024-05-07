@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer, models
 import torch
 
-class TextEncooderLinkBioBERT:
+class QueryEncooderLinkBioBERT:
     def __init__(self, max_length=512):
         if torch.cuda.is_available():
             self.device = "cuda"

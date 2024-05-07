@@ -1,20 +1,20 @@
 import json
 from openAI_chat import Chat
-from semantic_search_bioBERT import bioBERTretriever
-from BM25_search import BM25retriever
-from hybrid_search import HybridRetriever
-from medCPTRetriever import SemanticRetrievermedCPT
+from bioBERT_retriever import BioBERTRetriever
+from bm25_retriever import BM25Retriever
+from hybrid_retriever import HybridRetriever
+from medCPT_retriever import SemanticRetrieverMedCPT
 
-class RAG:
+class MedRAG:
     def __init__(self, retriever=1, question_type=1, n_docs=10):
         if retriever == 1:
-            self.retriever = bioBERTretriever()
+            self.retriever = BioBERTRetriever()
         elif retriever == 2:
-            self.retriever = BM25retriever()
+            self.retriever = BM25Retriever()
         elif retriever == 3:
             self.retriever = HybridRetriever()
         elif retriever == 4:
-            self.retriever = SemanticRetrievermedCPT(rerank=True)
+            self.retriever = SemanticRetrieverMedCPT(rerank=True)
         else:
             raise ValueError("Invalid retriever value. Choose 1 for bioBERT, 2 for BM25, or 3 for hybrid.")
 
