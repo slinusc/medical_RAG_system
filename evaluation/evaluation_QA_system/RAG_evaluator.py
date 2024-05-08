@@ -249,7 +249,7 @@ class RAG_evaluator:
         print("\nSummary of non-answered questions:")
         print(f"Absolute count - No Docs Found: {total_specific_counts}")
         print(f"Percentage - No Docs Found: {percentage_not_answered:.2f}%")
-        print("\nMetrics - RAG:")
+        print("\nMetrics - RAG Q&A:")
         print(f"Accuracy: {accuracy:.2f}")
         print(f"Recall: {recall:.2f}")
         print(f"Precision: {precision:.2f}")
