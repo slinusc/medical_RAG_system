@@ -10,8 +10,6 @@ class bioBERTEncoder:
         
         self.max_length = max_length
         
-        # Laden des vortrainierten BioBERT-Modells und Hinzufügen eines MEAN-Pooling-Layers
-        # Durchschnitt der Werte der Eingabemerkmale berechnet und als Ausgabe verwendet
         word_embedding_model = models.Transformer('dmis-lab/biobert-v1.1', max_seq_length=self.max_length)
         pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension(),
                                        pooling_mode_mean_tokens=True,
