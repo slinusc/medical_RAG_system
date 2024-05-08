@@ -53,8 +53,8 @@ class RAG_evaluator:
             response = self.request_selector(question)
             if response is not None:
                 results.append(response)
-                #iter = iter + 1
-                #if iter >= 10:
+                # iter = iter + 1
+                # if iter >= 10:
                 #    break
 
         # Write the results to the output JSON file
@@ -163,14 +163,10 @@ class RAG_evaluator:
                 "pmids_ground_truth": ground_truth_ids,  # the pubmed ids that are the ideal answer
                 "retreived_correct_pubmedid": retrieved_correct_ids,  # bool, wether or not any correct pubmed ids where retrived
                 "num_correct_retrieved_ids": num_correct_retrived_ids,  # numeric. number of pubmed ids correctly retrieved
-                "matching_retrieved_ids": str(
-                    matching_retrieved_ids
-                ),  # numeric, correctly used pubmedids retrieved
+                "matching_retrieved_ids": matching_retrieved_ids,  # numeric, correctly used pubmedids retrieved
                 "rag_used_correct_ids": rag_used_correct_ids,  # bool, wether or not any current pubmedid was used by the rag
                 "rag_used_num_correct_retrived_ids": rag_used_num_correct_retrived_ids,  # numeric, numer of pubmed ids correctly used by the rag
-                "rag_used_matching_retrieved_ids": str(
-                    rag_used_matching_retrieved_ids
-                ),  # numeric pubmedids that where correclty used
+                "rag_used_matching_retrieved_ids": rag_used_matching_retrieved_ids,  # numeric pubmedids that where correclty used
                 "requestime": elapsed_time,  # time used for the entire request
                 "retrievment_time": retriever_time,  # time used for retrievment
                 "generation_time": generation_time,  # time used for generation
@@ -217,8 +213,8 @@ class RAG_evaluator:
             "trueresponse_exact": question["cop"],  # groundtruth answer
             "ragresponse": response,  #
             "answered_correct": answered_correct,
-            "pmids_retrieved": str(k_pubmedids),
-            "pmids_uses_by_rag": str(used_pubmedids),
+            "pmids_retrieved": k_pubmedids,
+            "pmids_uses_by_rag": used_pubmedids,
             "pmids_ground_truth": ground_truth_ids,
             "requestime": elapsed_time,
             "retrievment_time": retriever_time,  # time used for retrievment
