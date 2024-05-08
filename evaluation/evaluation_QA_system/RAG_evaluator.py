@@ -325,7 +325,9 @@ class RAG_evaluator:
 
         return accuracy
 
+
     def analyze_performance(self, json_file_path):
+        """Analysiert die Performance anhand der Daten aus einer JSON-Datei."""
         # Load the JSON data
         with open(json_file_path, "r") as file:
             data = json.load(file)
@@ -333,8 +335,9 @@ class RAG_evaluator:
         # Convert JSON data into a DataFrame
         df = pd.DataFrame(data)
 
-        # extract the retriever number from the file path
-        retriever = re.search(r"ragver_(\d+)", json_file_path).group(1)
+        # Extract the retriever number from the file path
+        retriever_match = re.search(r"ragver_(\d+)", json_file_path)
+        retriever = retriever_match.group(1) if retriever_match else "Unknown"
         print(f"Summary Statistics for RAG with retriever {retriever}")
         print(f"Total Questions: {len(df)}")
 
@@ -368,7 +371,40 @@ class RAG_evaluator:
             average="weighted",
             zero_division=0,
         )
-        # count the nuber of no answer given
+
+        recall_list = []
+        precision_list = []
+        f1_score_list = []
+
+        # Iterating over the DataFrame
+        for i in range(len(df)):
+            ground_truth_pmids = list(df["pmids_ground_truth"][i])
+            matching_retrieved_ids = list(df["matching_retrieved_ids"][i])
+            retrieved_pmids = list(df["pmids_retrieved"][i])
+
+            # Calculate Recall
+            recall_retriever = len(matching_retrieved_ids) / len(ground_truth_pmids)
+            print(len(matching_retrieved_ids))
+            print(len(ground_truth_pmids))
+            recall_list.append(recall_retriever)
+
+            # Calculate Precision
+            precision_retriever = len(matching_retrieved_ids) / len(retrieved_pmids)
+            precision_list.append(precision_retriever)
+
+            # Calculate F1-Score
+            if precision_retriever + recall_retriever != 0:
+                f1_retriever = 2 * (precision_retriever * recall_retriever) / (precision_retriever + recall_retriever)
+            else:
+                f1_retriever = 0.0
+            f1_score_list.append(f1_retriever)
+
+        # Calculate average scores
+        avg_recall_retriever = sum(recall_list) / len(recall_list)
+        avg_precision_retriever = sum(precision_list) / len(precision_list)
+        avg_f1_retriever = sum(f1_score_list) / len(f1_score_list)
+
+        # Count the number of "no answer given" cases
         count_no_docs_found = (df["ragresponse"] == "no_docs_found").sum()
         count_five = (df["ragresponse"] == 5).sum()
         # Total specific counts
@@ -379,16 +415,22 @@ class RAG_evaluator:
 
         # Calculate percentages
         percentage_not_answered = (total_specific_counts / total_rows) * 100
+
         # Print or save the results
-        print("\nSummary of non answered questions:")
+        print("\nSummary of non-answered questions:")
         print(f"Absolute count - No Docs Found: {total_specific_counts}")
         print(f"Percentage - No Docs Found: {percentage_not_answered:.2f}%")
-        print("\nClassification Metrics:")
+        print("\nMetrics - RAG:")
         print("Accuracy: {:.2f}".format(accuracy))
         print("Recall: {:.2f}".format(recall))
         print("Precision: {:.2f}".format(precision))
         print("F1 Score: {:.2f}".format(f1))
+        print("\nMetrics - Retriever:")
+        print("Recall: {:.2f}".format(avg_recall_retriever))
+        print("Precision: {:.2f}".format(avg_precision_retriever))
+        print("F1 Score: {:.2f}".format(avg_f1_retriever))
+
         print("\nAdditional metrics:")
-        print(f"Mean response time overall: {round(df['requestime'].mean(),2)}")
-        print(f"Mean response time retriever: {round(df['retrievment_time'].mean(),2)}")
-        print(f"Mean response time generation: {round(df['generation_time'].mean(),2)}")
+        print(f"Mean response time overall: {round(df['requestime'].mean(), 2)}")
+        print(f"Mean response time retriever: {round(df['retrievment_time'].mean(), 2)}")
+        print(f"Mean response time generation: {round(df['generation_time'].mean(), 2)}")
