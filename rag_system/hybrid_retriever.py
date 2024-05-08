@@ -22,7 +22,7 @@ class HybridRetriever:
         reranked_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
         return reranked_docs
 
-    def retrieve_docs(self, query: str, top_n: int = 10, k: int = 100):
+    def retrieve_docs(self, query: str, top_n: int = 10, k: int = 20):
         """Retrieves documents from Elasticsearch and reranks them, returning only the top N results."""
         es_query = {
             "size": k,

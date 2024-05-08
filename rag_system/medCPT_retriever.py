@@ -49,13 +49,13 @@ class MedCPTRetriever:
         }
         return self.es.search(index=self.index, body=query)
 
-    def rerank_docs(self, query: str, docs: list):
-        """Reranks the documents based on their relevance to the query."""
+    def rerank_docs(self, query: str, docs: list, top_n: int):
+        """Reranks the documents based on their relevance to the query and returns the top N."""
         scores = self.reranker.score([doc['content'] for doc in docs], query)
-        reranked_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
+        reranked_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)[:top_n]
         return reranked_docs
 
-    def retrieve_docs(self, query: str, k: int = 10):
+    def retrieve_docs(self, query: str, k: int = 20, top_n: int = 10):
         """Retrieves documents relevant to the query using both FAISS and Elasticsearch."""
         response = self.faiss_request(query, k)
         PMIDs = response['PMIDs'][0]
@@ -69,7 +69,7 @@ class MedCPTRetriever:
 
         # Apply reranking if enabled
         if self.rerank_enabled:
-            reranked_docs = self.rerank_docs(query, docs)
+            reranked_docs = self.rerank_docs(query, docs, top_n)
             results = {
                 f"doc{idx + 1}": {
                     'PMID': doc['PMID'],
@@ -86,7 +86,7 @@ class MedCPTRetriever:
                     'title': doc['title'],
                     'content': doc['content']
                 }
-                for idx, doc in enumerate(docs)
+                for idx, doc in enumerate(docs[:top_n])
             }
 
         return json.dumps(results, indent=4)
@@ -95,4 +95,4 @@ class MedCPTRetriever:
 if __name__ == "__main__":
     retriever = MedCPTRetriever()
     query = "What is the treatment for diabetes?"
-    print(retriever.retrieve_docs(query, k=3))
+    print(retriever.retrieve_docs(query, k=20, top_n=3))
