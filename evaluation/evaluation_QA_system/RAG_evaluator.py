@@ -60,6 +60,54 @@ class RAG_evaluator:
             print(e)
             return None
 
+    def handle_llm_based_eval(self, question):
+        """Handles 'yesno' questions."""
+        start_time = time.time()
+        rag_answer = json.loads(self.rag_model.get_answer(question["body"]))
+        elapsed_time = time.time() - start_time
+
+        response = rag_answer.get("response")
+        k_pubmedids = list(map(str, rag_answer["retrieved_PMIDs"]))
+        used_pubmedids = list(map(str, rag_answer["used_PMIDs"]))
+
+        retriever_time = rag_answer["retrieval_time"]
+        generation_time = rag_answer["generation_time"]
+
+        ground_truth_ids = self.extract_pubmedid(question["documents"])
+        retrieved_correct_ids, num_correct_retrieved_ids, matching_retrieved_ids = (
+            self.compare_pubmed_ids(k_pubmedids, question["documents"])
+        )
+        (
+            rag_used_correct_ids,
+            rag_used_num_correct_retrieved_ids,
+            rag_used_matching_retrieved_ids,
+        ) = self.compare_pubmed_ids(used_pubmedids, question["documents"])
+
+        limit = 0
+
+        answered_correct = self.llm_eval(limit, response, question["exact_answer"])
+
+        return {
+            "questionid": question["id"],
+            "querytype": question["type"],
+            "question": question["body"],
+            "trueresponse_exact": question["exact_answer"].lower(),
+            "ragresponse": response.lower(),
+            "answered_correct": answered_correct,
+            "pmids_retrieved": k_pubmedids,
+            "pmids_uses_by_rag": used_pubmedids,
+            "pmids_ground_truth": ground_truth_ids,
+            "retrieved_correct_pubmedid": retrieved_correct_ids,
+            "num_correct_retrieved_ids": num_correct_retrieved_ids,
+            "matching_retrieved_ids": matching_retrieved_ids,
+            "rag_used_correct_ids": rag_used_correct_ids,
+            "rag_used_num_correct_retrieved_ids": rag_used_num_correct_retrieved_ids,
+            "rag_used_matching_retrieved_ids": rag_used_matching_retrieved_ids,
+            "requestime": elapsed_time,
+            "retrievment_time": retriever_time,
+            "generation_time": generation_time,
+        }
+
     def handle_list(self, question):
         """Handles 'yesno' questions."""
         start_time = time.time()
@@ -198,6 +246,23 @@ class RAG_evaluator:
             return int(rag_response) == int(true_response)
         except Exception:
             return False
+
+    def dummy_llm(self):
+        # delete if real implementation is done
+        pass
+
+    def llm_eval(self, limit, rag_response, true_response):
+        limit = limit + 1
+        response = self.dummy_llm(rag_response, true_response)
+        if int(response) == 0:
+            return False
+        elif int(response) == 1:
+            return True
+        else:  # if there is no valid response we try 2 times more to get one else we break
+            if limit < 3:
+                return self.llm_eval(limit, rag_response, true_response)
+            else:
+                return "no_valid_response_possible"
 
     def yesno_eval(self, rag_response, true_response):
         """Evaluates 'yesno' questions."""
