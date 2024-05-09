@@ -51,7 +51,7 @@ class RAG_evaluator:
                     case "list":
                         return self.handle_list(question)
                     case "summary" | "factoid":
-                        return None
+                        return self.handle_llm_based_eval(question)
                     case _:
                         return None
             else:
