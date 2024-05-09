@@ -5,12 +5,15 @@ import json
 import pandas as pd
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 
+
 class RAG_evaluator:
     """
     Evaluates the performance of a Retrieval-Augmented Generation (RAG) system.
     """
 
-    def __init__(self, rag_model, path_to_question_json, output_path, multiplechoice=False):
+    def __init__(
+        self, rag_model, path_to_question_json, output_path, multiplechoice=False
+    ):
         self.rag_model = rag_model
         self.path_to_jsonfile = path_to_question_json
         self.output_path = output_path
@@ -44,12 +47,60 @@ class RAG_evaluator:
             match question["type"]:
                 case "yesno":
                     return self.handle_yesno(question)
-                case "summary" | "factoid" | "list":
+                case "list":
+                    return self.handle_list(question)
+                case "summary" | "factoid":
                     return None
                 case _:
                     return None
         else:
             return self.handle_multiple_choice(question)
+
+    def handle_list(self, question):
+        """Handles 'yesno' questions."""
+        start_time = time.time()
+        rag_answer = json.loads(self.rag_model.get_answer(question["body"]))
+        elapsed_time = time.time() - start_time
+
+        response = rag_answer.get("response")
+        k_pubmedids = list(map(str, rag_answer["retrieved_PMIDs"]))
+        used_pubmedids = list(map(str, rag_answer["used_PMIDs"]))
+
+        retriever_time = rag_answer["retrieval_time"]
+        generation_time = rag_answer["generation_time"]
+
+        ground_truth_ids = self.extract_pubmedid(question["documents"])
+        retrieved_correct_ids, num_correct_retrieved_ids, matching_retrieved_ids = (
+            self.compare_pubmed_ids(k_pubmedids, question["documents"])
+        )
+        (
+            rag_used_correct_ids,
+            rag_used_num_correct_retrieved_ids,
+            rag_used_matching_retrieved_ids,
+        ) = self.compare_pubmed_ids(used_pubmedids, question["documents"])
+
+        answered_correct = self.list_eval(response, question["exact_answer"])
+
+        return {
+            "questionid": question["id"],
+            "querytype": question["type"],
+            "question": question["body"],
+            "trueresponse_exact": question["exact_answer"].lower(),
+            "ragresponse": response.lower(),
+            "answered_correct": answered_correct,
+            "pmids_retrieved": k_pubmedids,
+            "pmids_uses_by_rag": used_pubmedids,
+            "pmids_ground_truth": ground_truth_ids,
+            "retrieved_correct_pubmedid": retrieved_correct_ids,
+            "num_correct_retrieved_ids": num_correct_retrieved_ids,
+            "matching_retrieved_ids": matching_retrieved_ids,
+            "rag_used_correct_ids": rag_used_correct_ids,
+            "rag_used_num_correct_retrieved_ids": rag_used_num_correct_retrieved_ids,
+            "rag_used_matching_retrieved_ids": rag_used_matching_retrieved_ids,
+            "requestime": elapsed_time,
+            "retrievment_time": retriever_time,
+            "generation_time": generation_time,
+        }
 
     def handle_yesno(self, question):
         """Handles 'yesno' questions."""
@@ -65,8 +116,14 @@ class RAG_evaluator:
         generation_time = rag_answer["generation_time"]
 
         ground_truth_ids = self.extract_pubmedid(question["documents"])
-        retrieved_correct_ids, num_correct_retrieved_ids, matching_retrieved_ids = self.compare_pubmed_ids(k_pubmedids, question["documents"])
-        rag_used_correct_ids, rag_used_num_correct_retrieved_ids, rag_used_matching_retrieved_ids = self.compare_pubmed_ids(used_pubmedids, question["documents"])
+        retrieved_correct_ids, num_correct_retrieved_ids, matching_retrieved_ids = (
+            self.compare_pubmed_ids(k_pubmedids, question["documents"])
+        )
+        (
+            rag_used_correct_ids,
+            rag_used_num_correct_retrieved_ids,
+            rag_used_matching_retrieved_ids,
+        ) = self.compare_pubmed_ids(used_pubmedids, question["documents"])
 
         answered_correct = self.yesno_eval(response, question["exact_answer"])
 
@@ -94,13 +151,15 @@ class RAG_evaluator:
     def handle_multiple_choice(self, question):
         """Handles multiple-choice questions."""
         start_time = time.time()
-        rag_answer = json.loads(self.rag_model.get_answer(
-            f"{question['question']} \n"
-            f"1: {question['opa']} \n"
-            f"2: {question['opb']} \n"
-            f"3: {question['opc']} \n"
-            f"4: {question['opd']}"
-        ))
+        rag_answer = json.loads(
+            self.rag_model.get_answer(
+                f"{question['question']} \n"
+                f"1: {question['opa']} \n"
+                f"2: {question['opb']} \n"
+                f"3: {question['opc']} \n"
+                f"4: {question['opd']}"
+            )
+        )
         elapsed_time = time.time() - start_time
 
         response = rag_answer.get("response")
@@ -137,9 +196,30 @@ class RAG_evaluator:
     def yesno_eval(self, rag_response, true_response):
         """Evaluates 'yesno' questions."""
         valid_responses = {"yes", "no"}
-        if rag_response.lower() not in valid_responses or true_response.lower() not in valid_responses:
+        if (
+            rag_response.lower() not in valid_responses
+            or true_response.lower() not in valid_responses
+        ):
             return False
         return rag_response.lower() == true_response.lower()
+
+    def list_eval(self, rag_response, true_response):
+        # Normalize responses
+        normalized_rag = [item.lower().strip() for item in rag_response]
+        normalized_true = [item.lower().strip() for item in true_response]
+
+        # Check if at least one item matches
+        is_any_match = bool(set(normalized_rag) & set(normalized_true))
+
+        # Similarity score (nur wenns de linus wett)
+        # The similarity score is calculated as the Jaccard similarity index, which is the size of the intersection
+        # of the two sets divided by the size of their union. This gives us a measure of similarity based on how many
+        # items are common to both sets relative to the total number of unique items across both sets.
+        # intersection = set(normalized_rag).intersection(set(normalized_true))
+        # union = set(normalized_rag).union(set(normalized_true))
+        # similarity_score = len(intersection) / len(union) if union else 1.0  # Handle division by zero if both lists are empty
+
+        return is_any_match  # ,  similarity_score,
 
     def compare_pubmed_ids(self, pubmed_ids, documents):
         """Compares PubMed IDs returned by the RAG system."""
@@ -167,8 +247,12 @@ class RAG_evaluator:
     def manual_accuracy_score(self, y_true, y_pred):
         """Calculates the accuracy manually."""
         if len(y_true) != len(y_pred):
-            raise ValueError("The length of true labels and predicted labels must be the same.")
-        return sum(1 for true, pred in zip(y_true, y_pred) if true == pred) / len(y_true)
+            raise ValueError(
+                "The length of true labels and predicted labels must be the same."
+            )
+        return sum(1 for true, pred in zip(y_true, y_pred) if true == pred) / len(
+            y_true
+        )
 
     def analyze_performance(self, json_file_path):
         """Analysiert die Performance anhand der Daten aus einer JSON-Datei."""
@@ -188,10 +272,27 @@ class RAG_evaluator:
         print(f"Mean: {mean_response_time:.2f} seconds")
         print(f"Standard Deviation: {sd_response_time:.2f} seconds")
 
-        accuracy = self.manual_accuracy_score(df["trueresponse_exact"], df["ragresponse"])
-        recall = recall_score(df["trueresponse_exact"], df["ragresponse"], average="weighted", zero_division=0)
-        precision = precision_score(df["trueresponse_exact"], df["ragresponse"], average="weighted", zero_division=0)
-        f1 = f1_score(df["trueresponse_exact"], df["ragresponse"], average="weighted", zero_division=0)
+        accuracy = self.manual_accuracy_score(
+            df["trueresponse_exact"], df["ragresponse"]
+        )
+        recall = recall_score(
+            df["trueresponse_exact"],
+            df["ragresponse"],
+            average="weighted",
+            zero_division=0,
+        )
+        precision = precision_score(
+            df["trueresponse_exact"],
+            df["ragresponse"],
+            average="weighted",
+            zero_division=0,
+        )
+        f1 = f1_score(
+            df["trueresponse_exact"],
+            df["ragresponse"],
+            average="weighted",
+            zero_division=0,
+        )
 
         recall_list = []
         precision_list = []
@@ -207,19 +308,39 @@ class RAG_evaluator:
             matching_used_ids = list(df["rag_used_matching_retrieved_ids"][i])
             used_pmids = list(df["pmids_uses_by_rag"][i])
 
-            recall_retriever = len(matching_retrieved_ids) / len(ground_truth_pmids) if ground_truth_pmids else 0
-            precision_retriever = len(matching_retrieved_ids) / len(retrieved_pmids) if retrieved_pmids else 0
+            recall_retriever = (
+                len(matching_retrieved_ids) / len(ground_truth_pmids)
+                if ground_truth_pmids
+                else 0
+            )
+            precision_retriever = (
+                len(matching_retrieved_ids) / len(retrieved_pmids)
+                if retrieved_pmids
+                else 0
+            )
 
-            recall_used_vs_retrieved = len(used_pmids) / len(retrieved_pmids) if retrieved_pmids else 0
-            precision_used_vs_retrieved = len(matching_used_ids) / len(retrieved_pmids) if retrieved_pmids else 0
+            recall_used_vs_retrieved = (
+                len(used_pmids) / len(retrieved_pmids) if retrieved_pmids else 0
+            )
+            precision_used_vs_retrieved = (
+                len(matching_used_ids) / len(retrieved_pmids) if retrieved_pmids else 0
+            )
 
             if precision_retriever + recall_retriever:
-                f1_retriever = 2 * (precision_retriever * recall_retriever) / (precision_retriever + recall_retriever)
+                f1_retriever = (
+                    2
+                    * (precision_retriever * recall_retriever)
+                    / (precision_retriever + recall_retriever)
+                )
             else:
                 f1_retriever = 0.0
 
             if precision_used_vs_retrieved + recall_used_vs_retrieved:
-                f1_used_vs_retrieved = 2 * (precision_used_vs_retrieved * recall_used_vs_retrieved) / (precision_used_vs_retrieved + recall_used_vs_retrieved)
+                f1_used_vs_retrieved = (
+                    2
+                    * (precision_used_vs_retrieved * recall_used_vs_retrieved)
+                    / (precision_used_vs_retrieved + recall_used_vs_retrieved)
+                )
             else:
                 f1_used_vs_retrieved = 0.0
 
@@ -235,9 +356,15 @@ class RAG_evaluator:
         avg_precision_retriever = sum(precision_list) / len(precision_list)
         avg_f1_retriever = sum(f1_score_list) / len(f1_score_list)
 
-        avg_recall_used_vs_retrieved = sum(recall_used_vs_retrieved_list) / len(recall_used_vs_retrieved_list)
-        avg_precision_used_vs_retrieved = sum(precision_used_vs_retrieved_list) / len(precision_used_vs_retrieved_list)
-        avg_f1_used_vs_retrieved = sum(f1_used_vs_retrieved_list) / len(f1_used_vs_retrieved_list)
+        avg_recall_used_vs_retrieved = sum(recall_used_vs_retrieved_list) / len(
+            recall_used_vs_retrieved_list
+        )
+        avg_precision_used_vs_retrieved = sum(precision_used_vs_retrieved_list) / len(
+            precision_used_vs_retrieved_list
+        )
+        avg_f1_used_vs_retrieved = sum(f1_used_vs_retrieved_list) / len(
+            f1_used_vs_retrieved_list
+        )
 
         count_no_docs_found = (df["ragresponse"] == "no_docs_found").sum()
         count_five = (df["ragresponse"] == 5).sum()
@@ -264,7 +391,15 @@ class RAG_evaluator:
         print(f"F1 Score Used vs Retrieved: {avg_f1_used_vs_retrieved:.2f}")
 
         print("\nAdditional metrics:")
-        print(f"Mean response time retriever: {round(df['retrievment_time'].mean(), 2)}")
-        print(f"Standard deviation response time retriever: {round(df['retrievment_time'].std(), 2)}")
-        print(f"Mean response time generation: {round(df['generation_time'].mean(), 2)}")
-        print(f"Standard deviation response time generation: {round(df['generation_time'].std(), 2)}")
+        print(
+            f"Mean response time retriever: {round(df['retrievment_time'].mean(), 2)}"
+        )
+        print(
+            f"Standard deviation response time retriever: {round(df['retrievment_time'].std(), 2)}"
+        )
+        print(
+            f"Mean response time generation: {round(df['generation_time'].mean(), 2)}"
+        )
+        print(
+            f"Standard deviation response time generation: {round(df['generation_time'].std(), 2)}"
+        )
