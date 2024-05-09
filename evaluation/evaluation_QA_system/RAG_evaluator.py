@@ -43,18 +43,22 @@ class RAG_evaluator:
 
     def request_selector(self, question):
         """Selects the appropriate RAG model and processes the question."""
-        if not self.multiple_choice:
-            match question["type"]:
-                case "yesno":
-                    return self.handle_yesno(question)
-                case "list":
-                    return self.handle_list(question)
-                case "summary" | "factoid":
-                    return None
-                case _:
-                    return None
-        else:
-            return self.handle_multiple_choice(question)
+        try:
+            if not self.multiple_choice:
+                match question["type"]:
+                    case "yesno":
+                        return self.handle_yesno(question)
+                    case "list":
+                        return self.handle_list(question)
+                    case "summary" | "factoid":
+                        return None
+                    case _:
+                        return None
+            else:
+                return self.handle_multiple_choice(question)
+        except Exception as e:
+            print(e)
+            return None
 
     def handle_list(self, question):
         """Handles 'yesno' questions."""
@@ -79,14 +83,16 @@ class RAG_evaluator:
             rag_used_matching_retrieved_ids,
         ) = self.compare_pubmed_ids(used_pubmedids, question["documents"])
 
-        answered_correct = self.list_eval(response, question["exact_answer"])
+        answered_correct, response, exact_answer = self.list_eval(
+            response, question["exact_answer"]
+        )
 
         return {
             "questionid": question["id"],
             "querytype": question["type"],
             "question": question["body"],
-            "trueresponse_exact": question["exact_answer"].lower(),
-            "ragresponse": response.lower(),
+            "trueresponse_exact": exact_answer,
+            "ragresponse": response,
             "answered_correct": answered_correct,
             "pmids_retrieved": k_pubmedids,
             "pmids_uses_by_rag": used_pubmedids,
@@ -204,9 +210,12 @@ class RAG_evaluator:
         return rag_response.lower() == true_response.lower()
 
     def list_eval(self, rag_response, true_response):
-        # Normalize responses
-        normalized_rag = [item.lower().strip() for item in rag_response]
-        normalized_true = [item.lower().strip() for item in true_response]
+        # Normalize responses using the helper function
+        normalized_rag = self.flatten_and_normalize(rag_response)
+        normalized_true = self.flatten_and_normalize(true_response)
+
+        # Check if at least one item matches
+        is_any_match = bool(set(normalized_rag) & set(normalized_true))
 
         # Check if at least one item matches
         is_any_match = bool(set(normalized_rag) & set(normalized_true))
@@ -219,7 +228,7 @@ class RAG_evaluator:
         # union = set(normalized_rag).union(set(normalized_true))
         # similarity_score = len(intersection) / len(union) if union else 1.0  # Handle division by zero if both lists are empty
 
-        return is_any_match  # ,  similarity_score,
+        return is_any_match, normalized_rag, normalized_true  # ,  similarity_score,
 
     def compare_pubmed_ids(self, pubmed_ids, documents):
         """Compares PubMed IDs returned by the RAG system."""
@@ -253,6 +262,52 @@ class RAG_evaluator:
         return sum(1 for true, pred in zip(y_true, y_pred) if true == pred) / len(
             y_true
         )
+
+    def flatten_and_normalize(self, response):
+        # This helper function flattens nested lists and normalizes strings
+        flattened = []
+        for item in response:
+            if isinstance(item, list):
+                # If the item is a list, extend the flattened list with normalized subitems
+                flattened.extend([str(subitem).lower().strip() for subitem in item])
+            else:
+                # Otherwise, just append the normalized item
+                flattened.append(str(item).lower().strip())
+        return flattened
+
+    # Function to handle lists, flattening nested lists and normalizing strings
+    def process_list(self, items):
+        flattened = []
+        for item in items:
+            if isinstance(item, list):
+                # Recursively process nested lists
+                flattened.extend(self.process_list(item))
+            else:
+                # Normalize non-list items
+                flattened.append(self.normalize(item))
+        return flattened
+
+    # Helper function to handle string normalization
+    def normalize(self, item):
+        return str(item).lower().strip()
+
+    def flatten_and_normalize(self, response):
+
+        # Check if the response is a dictionary and process any lists found within
+        if isinstance(response, dict):
+            flattened = []
+            for value in response.values():
+                if isinstance(value, list):
+                    flattened.extend(self.process_list(value))
+                else:
+                    flattened.append(self.normalize(value))
+            return flattened
+        elif isinstance(response, list):
+            # If the initial response is a list, process it directly
+            return self.process_list(response)
+        else:
+            # Handle single non-list items
+            return [self.normalize(response)]
 
     def analyze_performance(self, json_file_path):
         """Analysiert die Performance anhand der Daten aus einer JSON-Datei."""
