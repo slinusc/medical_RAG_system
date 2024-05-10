@@ -249,15 +249,18 @@ class RAG_evaluator:
         print("\nSummary of non-answered questions:")
         print(f"Absolute count - No Docs Found: {total_specific_counts}")
         print(f"Percentage - No Docs Found: {percentage_not_answered:.2f}%")
+        
         print("\nMetrics - RAG Q&A:")
         print(f"Accuracy: {accuracy:.2f}")
         print(f"Recall: {recall:.2f}")
         print(f"Precision: {precision:.2f}")
         print(f"F1 Score: {f1:.2f}")
+
         print("\nMetrics - Retriever:")
         print(f"Recall Retriever: {avg_recall_retriever:.2f}")
         print(f"Precision Retriever: {avg_precision_retriever:.2f}")
         print(f"F1 Score Retriever: {avg_f1_retriever:.2f}")
+
         print("\nMetrics - Used vs Retrieved:")
         print(f"Recall Used vs Retrieved: {avg_recall_used_vs_retrieved:.2f}")
         print(f"Precision Used vs Retrieved: {avg_precision_used_vs_retrieved:.2f}")
