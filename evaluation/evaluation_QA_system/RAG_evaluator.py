@@ -12,7 +12,7 @@ class RAG_evaluator:
     """
 
     def __init__(
-        self, rag_model, path_to_question_json, output_path, multiplechoice=False
+            self, rag_model, path_to_question_json, output_path, multiplechoice=False
     ):
         self.rag_model = rag_model
         self.path_to_jsonfile = path_to_question_json
@@ -269,8 +269,8 @@ class RAG_evaluator:
         """Evaluates 'yesno' questions."""
         valid_responses = {"yes", "no"}
         if (
-            rag_response.lower() not in valid_responses
-            or true_response.lower() not in valid_responses
+                rag_response.lower() not in valid_responses
+                or true_response.lower() not in valid_responses
         ):
             return False
         return rag_response.lower() == true_response.lower()
@@ -449,18 +449,18 @@ class RAG_evaluator:
 
             if precision_retriever + recall_retriever:
                 f1_retriever = (
-                    2
-                    * (precision_retriever * recall_retriever)
-                    / (precision_retriever + recall_retriever)
+                        2
+                        * (precision_retriever * recall_retriever)
+                        / (precision_retriever + recall_retriever)
                 )
             else:
                 f1_retriever = 0.0
 
             if precision_used_vs_retrieved + recall_used_vs_retrieved:
                 f1_used_vs_retrieved = (
-                    2
-                    * (precision_used_vs_retrieved * recall_used_vs_retrieved)
-                    / (precision_used_vs_retrieved + recall_used_vs_retrieved)
+                        2
+                        * (precision_used_vs_retrieved * recall_used_vs_retrieved)
+                        / (precision_used_vs_retrieved + recall_used_vs_retrieved)
                 )
             else:
                 f1_used_vs_retrieved = 0.0
