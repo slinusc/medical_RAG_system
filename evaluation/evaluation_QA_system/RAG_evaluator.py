@@ -28,10 +28,15 @@ class RAG_evaluator:
             data = json.load(file)
 
         results = []
+        i = 0
         for question in tqdm(data["questions"], desc="Processing questions"):
             response = self.request_selector(question)
             if response is not None:
                 results.append(response)
+            i += 1
+
+            if i >= 10:
+                break
 
         # Write the results to the output JSON file
         with open(self.output_path, "w") as file:
@@ -92,7 +97,7 @@ class RAG_evaluator:
             "querytype": question["type"],
             "question": question["body"],
             "trueresponse_exact": question["exact_answer"],
-            "ragresponse": response.lower(),
+            "ragresponse": response,
             "answered_correct": answered_correct,
             "pmids_retrieved": k_pubmedids,
             "pmids_uses_by_rag": used_pubmedids,
@@ -429,38 +434,18 @@ class RAG_evaluator:
             matching_used_ids = list(df["rag_used_matching_retrieved_ids"][i])
             used_pmids = list(df["pmids_uses_by_rag"][i])
 
-            recall_retriever = (
-                len(matching_retrieved_ids) / len(ground_truth_pmids)
-                if ground_truth_pmids
-                else 0
-            )
-            precision_retriever = (
-                len(matching_retrieved_ids) / len(retrieved_pmids)
-                if retrieved_pmids
-                else 0
-            )
-
-            recall_used_vs_retrieved = (
-                len(used_pmids) / len(retrieved_pmids) if retrieved_pmids else 0
-            )
-            precision_used_vs_retrieved = (
-                len(matching_used_ids) / len(retrieved_pmids) if retrieved_pmids else 0
-            )
+            recall_retriever = (len(matching_retrieved_ids) / len(ground_truth_pmids) if ground_truth_pmids else 0)
+            precision_retriever = ( len(matching_retrieved_ids) / len(retrieved_pmids) if retrieved_pmids else 0)
+            recall_used_vs_retrieved = (len(used_pmids) / len(retrieved_pmids) if retrieved_pmids else 0)
+            precision_used_vs_retrieved = (len(matching_used_ids) / len(retrieved_pmids) if retrieved_pmids else 0)
 
             if precision_retriever + recall_retriever:
-                f1_retriever = (
-                        2
-                        * (precision_retriever * recall_retriever)
-                        / (precision_retriever + recall_retriever)
-                )
+                f1_retriever = (2* (precision_retriever * recall_retriever) / (precision_retriever + recall_retriever))
             else:
                 f1_retriever = 0.0
 
             if precision_used_vs_retrieved + recall_used_vs_retrieved:
-                f1_used_vs_retrieved = (
-                        2
-                        * (precision_used_vs_retrieved * recall_used_vs_retrieved)
-                        / (precision_used_vs_retrieved + recall_used_vs_retrieved)
+                f1_used_vs_retrieved = (2 * (precision_used_vs_retrieved * recall_used_vs_retrieved) / (precision_used_vs_retrieved + recall_used_vs_retrieved)
                 )
             else:
                 f1_used_vs_retrieved = 0.0
