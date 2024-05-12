@@ -91,7 +91,7 @@ class RAG_evaluator:
             "questionid": question["id"],
             "querytype": question["type"],
             "question": question["body"],
-            "trueresponse_exact": question["exact_answer"].lower(),
+            "trueresponse_exact": question["ideal_answer"].lower(),
             "ragresponse": response.lower(),
             "answered_correct": answered_correct,
             "pmids_retrieved": k_pubmedids,
