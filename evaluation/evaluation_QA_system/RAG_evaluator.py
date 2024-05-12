@@ -28,10 +28,15 @@ class RAG_evaluator:
             data = json.load(file)
 
         results = []
+        i = 0
         for question in tqdm(data["questions"], desc="Processing questions"):
             response = self.request_selector(question)
             if response is not None:
                 results.append(response)
+            i += 1
+
+            if i >= 10:
+                break
 
         # Write the results to the output JSON file
         with open(self.output_path, "w") as file:
@@ -439,7 +444,6 @@ class RAG_evaluator:
                 if retrieved_pmids
                 else 0
             )
-
             recall_used_vs_retrieved = (
                 len(used_pmids) / len(retrieved_pmids) if retrieved_pmids else 0
             )
