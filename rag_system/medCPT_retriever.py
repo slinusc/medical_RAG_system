@@ -70,6 +70,10 @@ class MedCPTRetriever:
         # Apply reranking if enabled
         if self.rerank_enabled:
             reranked_docs = self.rerank_docs(query, docs, top_n)
+        
+            # only take documents with a score > 0
+            reranked_docs = [doc for doc in reranked_docs if doc[1] > 0]
+
             results = {
                 f"doc{idx + 1}": {
                     'PMID': doc['PMID'],

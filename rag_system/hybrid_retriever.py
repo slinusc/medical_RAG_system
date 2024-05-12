@@ -46,7 +46,10 @@ class HybridRetriever:
         # Rerank the documents
         reranked_docs = self.rerank_docs(query, docs)
 
-        # Take only the top N reranked documents
+        # only take documents with a score > 0
+        reranked_docs = [doc for doc in reranked_docs if doc[1] > 0]
+
+        # Take max the top N reranked documents
         top_reranked_docs = reranked_docs[:top_n]
 
         # Construct the final results with reranked scores

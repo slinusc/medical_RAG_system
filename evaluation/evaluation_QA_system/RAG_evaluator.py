@@ -33,10 +33,6 @@ class RAG_evaluator:
             response = self.request_selector(question)
             if response is not None:
                 results.append(response)
-            i += 1
-
-            if i >= 10:
-                break
 
         # Write the results to the output JSON file
         with open(self.output_path, "w") as file:
