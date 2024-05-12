@@ -60,7 +60,7 @@ class RAG_evaluator:
             print(e)
             return None
 
-    def handle_llm_based_eval(self, question):
+    def handle_summary_factoid(self, question):
         """Handles 'yesno' questions."""
         start_time = time.time()
         rag_answer = json.loads(self.rag_model.get_answer(question["body"]))
@@ -252,6 +252,7 @@ class RAG_evaluator:
         pass
 
     def llm_eval(self, limit, rag_response, true_response):
+        return "Not_evaluated_yet"
         limit = limit + 1
         response = self.dummy_llm(rag_response, true_response)
         if int(response) == 0:
