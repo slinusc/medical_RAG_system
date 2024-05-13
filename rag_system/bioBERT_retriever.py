@@ -63,3 +63,11 @@ class BioBERTRetriever:
             }
 
         return json.dumps(results, indent=4)
+    
+    
+if __name__ == '__main__':
+    retriever = BioBERTRetriever()
+    query = "What is the role of sdRNA in cancer?"
+    n_docs = 5
+    response = retriever.retrieve_docs(query, n_docs)
+    print(response)

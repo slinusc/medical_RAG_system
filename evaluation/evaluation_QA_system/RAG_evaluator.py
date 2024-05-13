@@ -92,8 +92,8 @@ class RAG_evaluator:
             "questionid": question["id"],
             "querytype": question["type"],
             "question": question["body"],
-            "trueresponse_exact": question["ideal_answer"].lower(),
-            "ragresponse": response.lower(),
+            "trueresponse_exact": question["ideal_answer"],
+            "ragresponse": response,
             "answered_correct": answered_correct,
             "pmids_retrieved": k_pubmedids,
             "pmids_uses_by_rag": used_pubmedids,
@@ -394,6 +394,7 @@ class RAG_evaluator:
         print(f"Mean: {mean_response_time:.2f} seconds")
         print(f"Standard Deviation: {sd_response_time:.2f} seconds")
 
+
         accuracy = self.manual_accuracy_score(
             df["trueresponse_exact"], df["ragresponse"]
         )
@@ -416,12 +417,9 @@ class RAG_evaluator:
             zero_division=0,
         )
 
+
         recall_list = []
         precision_list = []
-        f1_score_list = []
-        recall_used_vs_retrieved_list = []
-        precision_used_vs_retrieved_list = []
-        f1_used_vs_retrieved_list = []
 
         for i in range(len(df)):
             ground_truth_pmids = list(df["pmids_ground_truth"][i])
@@ -430,100 +428,47 @@ class RAG_evaluator:
             matching_used_ids = list(df["rag_used_matching_retrieved_ids"][i])
             used_pmids = list(df["pmids_uses_by_rag"][i])
 
-            recall_retriever = (
+            recall_retrieval = (
                 len(matching_retrieved_ids) / len(ground_truth_pmids)
                 if ground_truth_pmids
                 else 0
             )
-            precision_retriever = (
-                len(matching_retrieved_ids) / len(retrieved_pmids)
-                if retrieved_pmids
+            precision_rag = (
+                len(matching_used_ids) / len(used_pmids)
+                if used_pmids
                 else 0
             )
-            recall_used_vs_retrieved = (
-                len(used_pmids) / len(retrieved_pmids) if retrieved_pmids else 0
-            )
-            precision_used_vs_retrieved = (
-                len(matching_used_ids) / len(retrieved_pmids) if retrieved_pmids else 0
-            )
 
-            if precision_retriever + recall_retriever:
-                f1_retriever = (
-                    2
-                    * (precision_retriever * recall_retriever)
-                    / (precision_retriever + recall_retriever)
-                )
-            else:
-                f1_retriever = 0.0
+            recall_list.append(recall_retrieval)
+            precision_list.append(precision_rag)
 
-            if precision_used_vs_retrieved + recall_used_vs_retrieved:
-                f1_used_vs_retrieved = (
-                    2
-                    * (precision_used_vs_retrieved * recall_used_vs_retrieved)
-                    / (precision_used_vs_retrieved + recall_used_vs_retrieved)
-                )
-            else:
-                f1_used_vs_retrieved = 0.0
-
-            recall_list.append(recall_retriever)
-            precision_list.append(precision_retriever)
-            f1_score_list.append(f1_retriever)
-
-            recall_used_vs_retrieved_list.append(recall_used_vs_retrieved)
-            precision_used_vs_retrieved_list.append(precision_used_vs_retrieved)
-            f1_used_vs_retrieved_list.append(f1_used_vs_retrieved)
-
-        avg_recall_retriever = sum(recall_list) / len(recall_list)
-        avg_precision_retriever = sum(precision_list) / len(precision_list)
-        avg_f1_retriever = sum(f1_score_list) / len(f1_score_list)
-
-        avg_recall_used_vs_retrieved = sum(recall_used_vs_retrieved_list) / len(
-            recall_used_vs_retrieved_list
-        )
-        avg_precision_used_vs_retrieved = sum(precision_used_vs_retrieved_list) / len(
-            precision_used_vs_retrieved_list
-        )
-        avg_f1_used_vs_retrieved = sum(f1_used_vs_retrieved_list) / len(
-            f1_used_vs_retrieved_list
-        )
-
-        count_no_docs_found = (df["ragresponse"] == "no_docs_found").sum()
-        count_five = (df["ragresponse"] == 5).sum()
-        total_specific_counts = count_no_docs_found + count_five
-
-        total_rows = len(df)
-        percentage_not_answered = (total_specific_counts / total_rows) * 100
+        avg_recall_retrieval = sum(recall_list) / len(recall_list)
+        avg_precision_rag = sum(precision_list) / len(precision_list)
 
         print("\nSummary of non-answered questions:")
+        count_no_docs_found = (df["ragresponse"] == "no_docs_found").sum()
+        total_specific_counts = count_no_docs_found  # Adjust this if there are other specific counts to include
+        total_rows = len(df)
+        percentage_not_answered = (total_specific_counts / total_rows) * 100
         print(f"Absolute count - No Docs Found: {total_specific_counts}")
         print(f"Percentage - No Docs Found: {percentage_not_answered:.2f}%")
-
+        
+        
         print("\nMetrics - RAG Q&A:")
         print(f"Accuracy: {accuracy:.2f}")
         print(f"Recall: {recall:.2f}")
         print(f"Precision: {precision:.2f}")
         print(f"F1 Score: {f1:.2f}")
+        
 
         print("\nMetrics - Retriever:")
-        print(f"Recall Retriever: {avg_recall_retriever:.2f}")
-        print(f"Precision Retriever: {avg_precision_retriever:.2f}")
-        print(f"F1 Score Retriever: {avg_f1_retriever:.2f}")
+        print(f"Average Recall: {avg_recall_retrieval:.2f}")
 
-        print("\nMetrics - Used vs Retrieved:")
-        print(f"Recall Used vs Retrieved: {avg_recall_used_vs_retrieved:.2f}")
-        print(f"Precision Used vs Retrieved: {avg_precision_used_vs_retrieved:.2f}")
-        print(f"F1 Score Used vs Retrieved: {avg_f1_used_vs_retrieved:.2f}")
+        print("\nMetrics for RAG Usage:")
+        print(f"Average Precision: {avg_precision_rag:.2f}")
 
         print("\nAdditional metrics:")
-        print(
-            f"Mean response time retriever: {round(df['retrievment_time'].mean(), 2)}"
-        )
-        print(
-            f"Standard deviation response time retriever: {round(df['retrievment_time'].std(), 2)}"
-        )
-        print(
-            f"Mean response time generation: {round(df['generation_time'].mean(), 2)}"
-        )
-        print(
-            f"Standard deviation response time generation: {round(df['generation_time'].std(), 2)}"
-        )
+        print(f"Mean response time retriever: {round(df['retrievment_time'].mean(), 2)}")
+        print(f"Standard deviation response time retriever: {round(df['retrievment_time'].std(), 2)}")
+        print(f"Mean response time generation: {round(df['generation_time'].mean(), 2)}")
+        print(f"Standard deviation response time generation: {round(df['generation_time'].std(), 2)}")

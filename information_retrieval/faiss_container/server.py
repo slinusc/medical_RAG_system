@@ -35,4 +35,4 @@ def search():
     return jsonify(PMIDs=matched_PMIDs, distances=distances.tolist())
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)  # Accessible over port 5000 on all network interfaces
+    app.run(host='0.0.0.0', port=5000)  # Accessible over port 5000 on all network interfaces
