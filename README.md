@@ -110,41 +110,11 @@ Evaluation scripts and notebooks are located in the `evaluation/evaluation_QA_sy
    evaluation/evaluation_QA_system/dataset_filter/filter_data.ipynb
    ```
 
-2. **Evaluate with Elasticsearch**
-
-   Use the provided notebooks and scripts to evaluate using Elasticsearch:
-
-   - `evaluation/evaluation_data_storages/elasticsearch/elastic.ipynb`
-   - `evaluation/evaluation_data_storages/elasticsearch/eval_elastic.ipynb`
-
-3. **Evaluate with Faiss**
-
-   Use the following notebooks and scripts for evaluation with Faiss:
-
-   - `evaluation/evaluation_data_storages/faiss/request.ipynb`
-   - `evaluation/evaluation_data_storages/faiss/conncatinatior.py`
-   - `evaluation/evaluation_data_storages/faiss/embedding_extractor.py`
-
-4. **Evaluate with MongoDB**
-
-   Use the MongoDB evaluation notebook:
-
-   - `evaluation/evaluation_data_storages/mongodb/eval_mongo.ipynb`
-   - `evaluation/evaluation_data_storages/mongodb/mongoDB.ipynb`
-
-5. **RAG Evaluator Script**
-
-   To run a comprehensive evaluation of the RAG system, use the `RAG_evaluator.py` script:
-
-   ```
-   python evaluation/evaluation_QA_system/RAG_evaluator.py
-   ```
-
+2. **Evaluate**
+To run the evaluation pipeline, use the evaluation_pipeline.ipynb notebook located in the evaluation/evaluation_QA_system/ directory. This notebook provides a comprehensive guide and setup to evaluate the performance of the RAG system.
 ## Data Storage
 
-- **Elasticsearch**: `evaluation/evaluation_data_storages/elasticsearch/`
-- **Faiss**: `evaluation/evaluation_data_storages/faiss/`
-- **MongoDB**: `evaluation/evaluation_data_storages/mongodb/`
+
 
 ## Contributing
 
