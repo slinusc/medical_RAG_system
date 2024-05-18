@@ -1,0 +1,46 @@
+anaconda==0.0.1.1  # Anaconda package
+annotated-types==0.6.0  # Support for typing-annotations
+anyio==4.3.0  # Async network and file operations
+argon2-cffi==23.1.0  # The secure Argon2 password hashing algorithm
+attrs==23.2.0  # Attributes without boilerplate
+Babel==2.14.0  # Internationalization utilities
+beautifulsoup4==4.12.3  # Screen-scraping library
+bleach==6.1.0  # Sanitize your inputs
+click==8.1.7  # Command Line Interface Creation Kit
+decorator==5.1.1  # Simplifies the usage of decorators
+elastic-transport==8.13.0  # Transport layer for Elasticsearch
+elasticsearch==8.13.0  # Official Elasticsearch client
+faiss-cpu==1.8.0  # A library for efficient similarity search and clustering
+Flask==3.0.3  # Micro web framework
+fsspec==2024.3.1  # File system specification
+huggingface-hub==0.22.2  # Client library for Huggingface hub
+idna==3.3  # Internationalized Domain Names in Applications (IDNA)
+importlib-metadata==4.6.4  # Library to access the metadata for a Python package
+joblib==1.4.0  # Lightweight pipelining in Python
+jsonschema==4.21.1  # JSON Schema validation for Python
+jupyter==1.0.0  # Jupyter metapackage
+jupyterlab==4.1.8  # JupyterLab: the next generation Jupyter notebook
+MarkupSafe==2.1.5  # Implements a XML/HTML/XHTML Markup safe string for Python
+matplotlib==3.8.4  # Plotting library for Python
+more-itertools==8.10.0  # More routines for operating on iterables, beyond itertools
+nbconvert==7.16.3  # Convert Jupyter Notebooks
+numpy==1.26.4  # Fundamental package for array computing
+openai==1.23.3  # OpenAI API client
+packaging==24.0  # Core utilities for Python packages
+pandas==2.2.2  # Data analysis and manipulation library
+prompt-toolkit==3.0.43  # Library for building powerful interactive command lines
+psutil==5.9.8  # Cross-platform process and system utilities
+pydantic==2.7.1  # Data validation and settings management using Python type annotations
+Pygments==2.17.2  # Syntax highlighting package
+regex==2024.4.16  # Alternative regular expression module
+requests==2.31.0  # Simple HTTP library for Python
+scikit-learn==1.4.2  # Machine learning library
+scipy==1.13.0  # Fundamental library for scientific computing
+sentence-transformers==2.7.0  # BERT and SentenceTransformers library
+six==1.16.0  # Python 2 and 3 compatibility utilities
+tqdm==4.66.2  # Fast, extensible progress bar for Python
+traitlets==5.14.2  # Configuration system for Python applications
+transformers==4.40.0  # State-of-the-art Natural Language Processing for TensorFlow and PyTorch
+torch==2.2.2  # Tensors and Dynamic neural networks in Python with strong GPU acceleration
+urllib3==1.26.5  # HTTP library with thread-safe connection pooling
+Werkzeug==3.0.2  # Comprehensive WSGI web application library

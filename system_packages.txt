@@ -1,0 +1,12 @@
+# Essential system packages for Ubuntu 22.04.4 LTS (Jammy)
+apt  # Advanced Package Tool, a package management system for Debian
+curl  # Command line tool for transferring data with URLs
+gcc  # GNU Compiler Collection, a compiler system
+g++  # GNU C++ Compiler
+make  # Utility for directing compilation
+python3  # Python programming language interpreter
+python3-pip  # Package installer for Python
+git  # Version control system
+docker-ce  # Docker: the open-source application container engine
+docker-compose-plugin  # Docker Compose (V2) plugin for the Docker CLI
+build-essential  # Informational list of build-essential packages
