@@ -79,7 +79,7 @@ To set up the Medical RAG System, follow these steps:
 
 3. **Download Pre-trained Models**
 
-   Ensure that you download and set up any necessary pre-trained models (e.g., bioBERT, CPT).
+   Ensure that you download and set up any necessary pre-trained models (e.g., BioBERT, MedCPT).
 
 ## Usage
 
