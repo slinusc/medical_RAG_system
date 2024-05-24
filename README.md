@@ -24,36 +24,54 @@ The Medical RAG System is designed to enhance medical information retrieval and 
 ## File structure
 
 ```plaintext
-medical_RAG_system/
-├── evaluation/
-│   ├── evaluation_QA_system/
-│   │   ├── RAG_evaluator.py
-│   │   ├── evaluation_pipeline.ipynb
-│   │   ├── full_text_evaluation.py
-│   │   ├── explore_questions.ipynb
-│   │   └── dataset_filter/
-│   │       └── filter_data.ipynb
-│   ├── evaluation_data_storages/
-│   │   ├── documentation.md
-│   │   ├── elasticsearch/
-│   │   │   ├── elastic.ipynb
-│   │   │   └── eval_elastic.ipynb
-│   │   ├── faiss/
-│   │   │   ├── conncatinatior.py
-│   │   │   ├── embedding_extractor.py
-│   │   │   └── request.ipynb
-│   │   └── mongodb/
-│   │       ├── eval_mongo.ipynb
-│   │       └── mongoDB.ipynb
-├── rag_system/
-│   ├── bioBERT_retriever.py
-│   ├── bm25_retriever.py
-│   ├── hybrid_retriever.py
-│   ├── medCPT_encoder.py
-│   ├── medCPT_retriever.py
-│   ├── med_rag.py
-│   └── pipeline.ipynb
-└── README.md
+├── evaluation
+│   ├── evaluation_data_storages
+│   │   ├── documentation.md
+│   │   ├── elasticsearch
+│   │   │   ├── elastic.ipynb
+│   │   │   └── eval_elastic.ipynb
+│   │   ├── faiss
+│   │   │   ├── conncatinatior.py
+│   │   │   ├── embedding_extractor.py
+│   │   │   └── request.ipynb
+│   │   └── mongodb
+│   │       ├── eval_mongo.ipynb
+│   │       └── mongoDB.ipynb
+│   └── evaluation_QA_system
+│       ├── dataset_filter
+│       │   └── filter_data.ipynb
+│       ├── evaluation_pipeline.ipynb
+│       ├── explore_questions.ipynb
+│       ├── full_text_evaluation.py
+│       └── RAG_evaluator.py
+├── information_retrieval
+│   ├── document_encoding
+│   │   ├── bioBERT_encoder.py
+│   │   ├── encode_documents.ipynb
+│   │   └── medCPT_encoder.py
+│   ├── elastic_container
+│   │   ├── elastic.ipynb
+│   │   ├── ingest_data.py
+│   │   └── start_elasticsearch.sh
+│   └── faiss_container
+│       ├── docker-compose.yml
+│       ├── Dockerfile
+│       ├── faiss_insert_data.ipynb
+│       └── server.py
+├── rag_system
+│   ├── bioBERT_encoder.py
+│   ├── bioBERT_retriever.py
+│   ├── bm25_retriever.py
+│   ├── hybrid_retriever.py
+│   ├── medCPT_encoder.py
+│   ├── medCPT_retriever.py
+│   ├── med_rag.py
+│   ├── openAI_chat.py
+│   └── pipeline.ipynb
+├── README.md
+├── requirements.txt
+└── sys_requirements.txt
+
 ```
 
 ## Installation
