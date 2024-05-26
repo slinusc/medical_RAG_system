@@ -16,15 +16,24 @@ else
   echo "Volume 'elasticsearch_data' ist bereits vorhanden."
 fi
 
+docker pull docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+
 # Elasticsearch-Container starten
 echo "Starte Elasticsearch-Container..."
-docker run -d \
+docker run \
   --name es01 \
   --net elastic \
   -p 9200:9200 \
-  --memory 16g \
+  -it \
+  -m 32GB \
   --volume elasticsearch_data:/usr/share/elasticsearch/data \
-  -e "discovery.type=single-node" \
-  docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+  -e "ES_JAVA_OPTS=-Xms16g -Xmx16g" \ 
+  docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+
+# 16GB RAM im Heap festlegen (Xms und Xmx) um OutOfMemoryError zu vermeiden
 
 echo "Elasticsearch-Container wurde gestartet."
+
+
+# if crt problem, use this command to start the container
+# docker run --name es01 --net elastic -p 9200:9200 -it -m 32GB -e "ES_JAVA_OPTS=-Xms16g -Xmx16g" docker.elastic.co/elasticsearch/elasticsearch:8.13.4

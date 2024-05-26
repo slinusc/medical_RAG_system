@@ -10,12 +10,12 @@ password = os.getenv("ELASTIC_PASSWORD")
 
 es = Elasticsearch(
     hosts=[{"host": "localhost", "port": 9200, "scheme": "https"}],
-    ca_certs="/home/ubuntu/.crts/http_ca.crt",
+    ca_certs="/home/rag/.crt/http_ca.crt",
     basic_auth=("elastic", password),
 )
 
 # Define the index name
-index_name = "pubmed_index_embedded"
+index_name = "pubmed_index"
 
 # Delete the index if it exists
 if es.indices.exists(index=index_name):
@@ -29,8 +29,8 @@ if not es.indices.exists(index=index_name):
         "analysis": {
             "analyzer": {
                 "default": {
-                    "type": "standard",  # You can choose from many types like `english`, `standard`, etc., depending on your needs.
-                    "stopwords": "_english_"  # This is optional and can be customized.
+                    "type": "standard",  
+                    "stopwords": "_english_" 
                 }
             }
         }
@@ -43,7 +43,7 @@ if not es.indices.exists(index=index_name):
                 "fields": {
                     "keyword": {
                         "type": "keyword",
-                        "ignore_above": 256
+                        "ignore_above": 256 
                     }
                 }
             }
@@ -55,7 +55,7 @@ if not es.indices.exists(index=index_name):
 # Create the index with the defined mapping
 es.indices.create(index=index_name, body=mapping)
 
-source_directory = Path('/home/ubuntu/data/pubmed_bioBERT')
+source_directory = Path('/home/rag/data/chunk')
 error_log_path = Path('./errors.jsonl')  # Pfad zur Fehlerprotokolldatei
 
 def bulk_index_documents(source_directory, index_name, error_log_path):

@@ -9,7 +9,7 @@ class BM25Retriever:
             ['https://localhost:9200'],
             basic_auth=('elastic', elastic_password),
             verify_certs=True,
-            ca_certs="/home/ubuntu/.crts/http_ca.crt",
+            ca_certs="/home/rag/.crt/http_ca.crt",
             request_timeout=60
         )
         self.index = "pubmed_index"
@@ -34,7 +34,8 @@ class BM25Retriever:
             results[doc_key] = {
                 'PMID': doc['_source']['PMID'],
                 'title': doc['_source']['title'],
-                'content': doc['_source']['content']
+                'content': doc['_source']['content'],
+                'score': doc['_score']
             }
 
         return json.dumps(results, indent=4)

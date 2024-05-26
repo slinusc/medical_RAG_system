@@ -10,7 +10,7 @@ class HybridRetriever:
             ['https://localhost:9200'],
             basic_auth=('elastic', elastic_password),
             verify_certs=True,
-            ca_certs="/home/ubuntu/.crts/http_ca.crt",
+            ca_certs="/home/rag/.crt/http_ca.crt",
             request_timeout=60
         )
         self.index = "pubmed_index"
