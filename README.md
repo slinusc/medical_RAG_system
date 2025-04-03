@@ -133,6 +133,21 @@ To run the evaluation pipeline, use the evaluation_pipeline.ipynb notebook locat
 ## Data Storage
 
 
+## Used Infrastructure
+
+The experiments were conducted on the following system:
+
+| **Component**        | **Specification**                          |
+|----------------------|--------------------------------------------|
+| **Architecture**     | x86_64                                     |
+| **CPU**              | 8 CPUs                                     |
+| **Model**            | Intel Core Processor (Broadwell)           |
+| **Memory**           | 32 GiB total, 10 GiB used for buffers/cache |
+| **Storage**          | 240 GiB disk size                          |
+| **Operating System** | Ubuntu 22.04.4 LTS (Jammy)                 |
+| **Kernel Version**   | 5.15.0-102-generic                         |
+| **GPU**              | NVIDIA A30                                 |
+
 
 ## Contributing
 
