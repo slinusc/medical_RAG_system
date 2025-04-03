@@ -130,8 +130,6 @@ Evaluation scripts and notebooks are located in the `evaluation/evaluation_QA_sy
 
 2. **Evaluate**
 To run the evaluation pipeline, use the evaluation_pipeline.ipynb notebook located in the evaluation/evaluation_QA_system/ directory. This notebook provides a comprehensive guide and setup to evaluate the performance of the RAG system.
-## Data Storage
-
 
 ## Used Infrastructure
 
