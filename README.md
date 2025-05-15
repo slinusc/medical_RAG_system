@@ -1,6 +1,12 @@
 
 # Medical RAG System
 
+## 📄 Publications
+
+- **Efficient and Reproducible Biomedical Question Answering using Retrieval Augmented Generation**  
+  Linus Stuhlmann, et al.  
+  [Read the paper on arXiv (PDF)](https://arxiv.org/pdf/2505.07917)
+
 This repository contains a comprehensive implementation of a Medical Retrieval-Augmented Generation (RAG) system. The system integrates multiple components for document retrieval, question answering, and evaluation, tailored specifically for the medical domain.
 
 ## Table of Contents
