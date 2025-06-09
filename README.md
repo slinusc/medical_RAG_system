@@ -1,24 +1,6 @@
 
 # Medical RAG System
 
-## 📄 Publications
-
-**Efficient and Reproducible Biomedical Question Answering using Retrieval Augmented Generation**  
-Linus Stuhlmann, Michael Saxer, Jonathan Fürst
-
-Please cite our work:
-
-```bibtex
-@article{stuhlmann2025efficient,
-  title={Efficient and Reproducible Biomedical Question Answering using Retrieval Augmented Generation},
-  author={Stuhlmann, Linus and Saxer, Michael Alexander and F{\"u}rst, Jonathan},
-  journal={arXiv preprint arXiv:2505.07917},
-  year={2025}
-}
-```
-
-[Read the paper on arXiv](https://arxiv.org/abs/2505.07917)
-
 This repository contains a comprehensive implementation of a Medical Retrieval-Augmented Generation (RAG) system. The system integrates multiple components for document retrieval, question answering, and evaluation, tailored specifically for the medical domain.
 
 ## Table of Contents
@@ -174,6 +156,24 @@ We welcome contributions to enhance the Medical RAG System. Please follow these 
 3. Make your changes and commit them: `git commit -m 'Add new feature'`.
 4. Push to the branch: `git push origin feature-branch`.
 5. Create a pull request.
+
+## 📄 Publications
+
+**Efficient and Reproducible Biomedical Question Answering using Retrieval Augmented Generation**  
+Linus Stuhlmann, Michael Saxer, Jonathan Fürst
+
+Please cite our work:
+
+```bibtex
+@article{stuhlmann2025efficient,
+  title={Efficient and Reproducible Biomedical Question Answering using Retrieval Augmented Generation},
+  author={Stuhlmann, Linus and Saxer, Michael Alexander and F{\"u}rst, Jonathan},
+  journal={arXiv preprint arXiv:2505.07917},
+  year={2025}
+}
+```
+
+[Read the paper on arXiv](https://arxiv.org/abs/2505.07917)
 
 ## License
 
