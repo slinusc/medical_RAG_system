@@ -114,6 +114,10 @@ The system can be used for different purposes, including document retrieval, que
 - **Medical RAG**: `rag_system/med_rag.py`
 - **OpenAI Chat**: `rag_system/openAI_chat.py`
 
+### Datasets
+
+The 2.4M abstract subset we used can be accessed here: https://huggingface.co/datasets/slinusc/PubMedAbstractsSubset
+
 ### Evaluation
 
 Evaluation scripts and notebooks are located in the `evaluation/evaluation_QA_system/` directory. Example notebooks are provided to demonstrate the evaluation process.
