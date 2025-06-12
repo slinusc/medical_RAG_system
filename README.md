@@ -116,7 +116,8 @@ The system can be used for different purposes, including document retrieval, que
 
 ### Datasets
 
-The 2.4M PubmEd subset we used can be accessed here: https://huggingface.co/datasets/slinusc/PubMedAbstractsSubset. If you're looking for the precomputed embedding vectors (MedCPT) used in our work [*Efficient and Reproducible Biomedical Question Answering using Retrieval Augmented Generation*](https://arxiv.org/abs/2505.07917), they are available in a separate dataset: [slinusc/PubMedAbstractsSubsetEmbedded](https://huggingface.co/datasets/slinusc/PubMedAbstractsSubsetEmbedded).
+The 2.4M PubmEd subset we used can be accessed here: [slinusc/PubMedAbstractsSubset](https://huggingface.co/datasets/slinusc/PubMedAbstractsSubset).
+ If you're looking for the precomputed embedding vectors (MedCPT) used in our work [*Efficient and Reproducible Biomedical Question Answering using Retrieval Augmented Generation*](https://arxiv.org/abs/2505.07917), they are available in a separate dataset: [slinusc/PubMedAbstractsSubsetEmbedded](https://huggingface.co/datasets/slinusc/PubMedAbstractsSubsetEmbedded).
 
 ### Evaluation
 
